@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnoMed · WU-08 Banco de Saldos Fair-Play</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased m-0 p-0">
+
+  <!-- Banner Superior Común -->
+  <header class="bg-[#0F4C81] text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[#0D9488] text-white flex items-center justify-center font-bold text-base shadow-inner">+</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold tracking-tight">TurnoMed</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-white/15 text-white/95 font-medium">Hospital Universitario · Urgencias</span>
+          </div>
+          <p class="text-xs text-blue-100">Gestión Inteligente de Turnos y Guardias Sanitarias</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap items-center gap-1 text-xs">
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Mi Calendario</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Publicar Guardia</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Tablón P2P</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Panel Supervisor</span>
+        <span class="px-3 py-1.5 rounded-md bg-white text-[#0F4C81] font-semibold shadow-sm cursor-default">Fair-Play</span>
+      </nav>
+
+      <div class="flex items-center gap-3 text-xs">
+        <div class="px-2.5 py-1 rounded-md bg-[#0D9488] text-white font-medium">Fair-Play: +1</div>
+        <div class="text-right leading-tight">
+          <div class="font-semibold">Laura Gómez</div>
+          <div class="text-blue-100">Enfermería · ENF-042</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Título -->
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div>
+        <h1 class="text-lg font-bold text-[#0F172A]">Banco de saldos de guardias y turnos (Fair-Play)</h1>
+        <p class="text-xs text-[#475569]">Marcador transparente de guardias cedidas y asumidas sin trueque recíproco inmediato.</p>
+      </div>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-[#E0F2FE] text-[#0F4C81] font-semibold border border-[#BAE6FD]">WU-08 · Sanitario / Supervisor</span>
+    </div>
+
+    <!-- Tarjetas Resumen Personal -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
+        <div class="text-xs font-medium text-[#475569]">Mi Saldo Neto Fair-Play</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-bold text-[#16A34A]">+1 turno</span>
+          <span class="text-xs text-[#475569]">(+10 horas a favor)</span>
+        </div>
+      </div>
+      <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
+        <div class="text-xs font-medium text-[#475569]">Coberturas unilaterales asumidas</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-bold text-[#0F4C81]">2</span>
+          <span class="text-xs text-[#475569]">(1 baja urgente + 1 cesión)</span>
+        </div>
+      </div>
+      <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
+        <div class="text-xs font-medium text-[#475569]">Turnos cedidos sin devolución</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span class="text-2xl font-bold text-[#0F172A]">1</span>
+          <span class="text-xs text-[#475569]">(Trueques 1×1 no alteran saldo)</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Ranking de Equidad de Planta -->
+      <section class="lg:col-span-5 bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+        <div>
+          <h2 class="text-sm font-semibold text-[#0F172A]">Balance de equidad en la planta (Urgencias)</h2>
+          <p class="text-xs text-[#475569]">Ayuda al supervisor a evitar sobrecargar siempre al mismo personal.</p>
+        </div>
+
+        <div class="space-y-2.5" id="plant-ranking"></div>
+      </section>
+
+      <!-- Desglose Histórico -->
+      <section class="lg:col-span-7 bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-sm font-semibold text-[#0F172A]">Desglose histórico de movimientos</h2>
+            <p class="text-xs text-[#475569]">Solo las cesiones unilaterales y bajas urgentes alteran el saldo</p>
+          </div>
+          <select id="filter-type" onchange="renderMovements()" class="px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A]">
+            <option value="all">Todos los movimientos</option>
+            <option value="delta">Solo cambios de saldo (+1 / -1)</option>
+            <option value="swap">Solo trueques recíprocos (0)</option>
+          </select>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]">
+                <th class="py-2 px-3 font-semibold">Fecha</th>
+                <th class="py-2 px-3 font-semibold">Operación</th>
+                <th class="py-2 px-3 font-semibold">Compañero</th>
+                <th class="py-2 px-3 font-semibold text-right">Impacto</th>
+              </tr>
+            </thead>
+            <tbody id="movements-body" class="divide-y divide-[#E2E8F0]"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <script>
+    const plantBalances = [
+      { name: "Javier Castro (ENF-027)", balance: 2, hours: "+17h", status: "Prioridad descanso" },
+      { name: "Laura Gómez (ENF-042 · Tú)", balance: 1, hours: "+10h", status: "A favor" },
+      { name: "Carlos Ruiz (ENF-019)", balance: 0, hours: "0h", status: "Equilibrado" },
+      { name: "Ana Belén Gil (ENF-024)", balance: 0, hours: "0h", status: "Equilibrado" },
+      { name: "Marta Sánchez (ENF-031)", balance: -1, hours: "-10h", status: "Pendiente devolver" },
+      { name: "Elena Morales (ENF-014)", balance: -2, hours: "-14h", status: "Prioridad para cubrir" }
+    ];
+
+    const movements = [
+      { date: "15 Nov", type: "delta", title: "Cobertura baja urgente (Noche 15 Nov)", peer: "Marta Sánchez (ENF-031)", delta: "+1" },
+      { date: "10 Nov", type: "swap", title: "Trueque recíproco 1×1 (Mañana ↔ Mañana)", peer: "Carlos Ruiz (ENF-019)", delta: "0" },
+      { date: "04 Nov", type: "delta", title: "Cesión unilateral de turno (Tarde 04 Nov)", peer: "Elena Morales (ENF-014)", delta: "-1" },
+      { date: "28 Oct", type: "delta", title: "Asunción guardia sin devolución (Tarde)", peer: "Javier Castro (ENF-027)", delta: "+1" }
+    ];
+
+    function renderRanking() {
+      const box = document.getElementById("plant-ranking");
+      box.innerHTML = plantBalances.map(p => {
+        let badge = "bg-[#F1F5F9] text-[#475569]";
+        if (p.balance > 0) badge = "bg-[#DCFCE7] text-[#16A34A]";
+        else if (p.balance < 0) badge = "bg-[#FEF3C7] text-[#D97706]";
+        const sign = p.balance > 0 ? `+${p.balance}` : `${p.balance}`;
+
+        return `
+          <div class="p-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] flex items-center justify-between gap-2 text-xs">
+            <div>
+              <div class="font-semibold text-[#0F172A]">${p.name}</div>
+              <div class="text-[#475569]">${p.status} (${p.hours})</div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full font-bold ${badge}">${sign} turno(s)</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderMovements() {
+      const filter = document.getElementById("filter-type").value;
+      const list = movements.filter(m => filter === "all" || m.type === filter);
+      const tbody = document.getElementById("movements-body");
+      tbody.innerHTML = list.map(m => {
+        let pill = "bg-[#F1F5F9] text-[#475569]";
+        if (m.delta === "+1") pill = "bg-[#DCFCE7] text-[#16A34A]";
+        if (m.delta === "-1") pill = "bg-[#FEE2E2] text-[#DC2626]";
+
+        return `
+          <tr>
+            <td class="py-2.5 px-3 text-[#475569] whitespace-nowrap">${m.date}</td>
+            <td class="py-2.5 px-3 font-medium text-[#0F172A]">${m.title}</td>
+            <td class="py-2.5 px-3 text-[#475569]">${m.peer}</td>
+            <td class="py-2.5 px-3 text-right">
+              <span class="px-2.5 py-0.5 rounded-full font-bold ${pill}">${m.delta}</span>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    renderRanking();
+    renderMovements();
+  </script>
+</body>
+</html>

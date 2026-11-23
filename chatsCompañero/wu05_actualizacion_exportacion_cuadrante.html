@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnoMed · WU-05 Cuadrante Oficial y Exportación</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased m-0 p-0">
+
+  <!-- Banner Superior Común -->
+  <header class="bg-[#0F4C81] text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[#0D9488] text-white flex items-center justify-center font-bold text-base shadow-inner">+</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold tracking-tight">TurnoMed</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-white/15 text-white/95 font-medium">Hospital Universitario · Urgencias</span>
+          </div>
+          <p class="text-xs text-blue-100">Gestión Inteligente de Turnos y Guardias Sanitarias</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap items-center gap-1 text-xs">
+        <span class="px-3 py-1.5 rounded-md bg-white text-[#0F4C81] font-semibold shadow-sm cursor-default">Cuadrante Oficial</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Bandeja Aprobación</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Bajas Urgentes</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Avisos Planta</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Fair-Play</span>
+      </nav>
+
+      <div class="flex items-center gap-3 text-xs">
+        <div class="px-2.5 py-1 rounded-md bg-[#0D9488] text-white font-medium">Rol: Supervisor</div>
+        <div class="text-right leading-tight">
+          <div class="font-semibold">Dr. Martín Vega</div>
+          <div class="text-blue-100">Supervisor Planta · SUP-008</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Título y Exportación -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="text-lg font-bold text-[#0F172A]">Actualización y exportación automática del cuadrante oficial</h1>
+        <p class="text-xs text-[#475569]">Cuadrante consolidado en tiempo real tras cada aprobación, con resaltado de permutas y registro de auditoría.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs px-2.5 py-1 rounded-full bg-[#E0F2FE] text-[#0F4C81] font-semibold border border-[#BAE6FD]">WU-05 · Supervisor</span>
+        <button type="button" onclick="exportDoc('PDF')"
+          class="px-3.5 py-2 rounded-lg bg-[#0F4C81] text-white text-xs font-semibold hover:bg-[#0B3B66] transition shadow-sm cursor-pointer">
+          Exportar PDF Oficial
+        </button>
+        <button type="button" onclick="exportDoc('Excel (.xlsx)')"
+          class="px-3.5 py-2 rounded-lg bg-[#0D9488] text-white text-xs font-semibold hover:opacity-90 transition shadow-sm cursor-pointer">
+          Exportar Excel RRHH (.xlsx)
+        </button>
+      </div>
+    </div>
+
+    <div id="export-toast" class="hidden p-3.5 rounded-xl border border-[#BBF7D0] bg-[#DCFCE7] text-[#16A34A] text-xs font-medium"></div>
+
+    <!-- Matriz del Cuadrante -->
+    <section class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-sm font-semibold text-[#0F172A]">Cuadrante Oficial · Semana del 18 al 24 de Noviembre 2026</h2>
+        <div class="flex flex-wrap items-center gap-3 text-xs text-[#475569]">
+          <span class="px-2 py-0.5 rounded bg-[#DBEAFE] text-[#1D4ED8] font-medium">M = Mañana</span>
+          <span class="px-2 py-0.5 rounded bg-[#E0E7FF] text-[#4338CA] font-medium">T = Tarde</span>
+          <span class="px-2 py-0.5 rounded bg-[#FEF3C7] text-[#B45309] font-medium">N = Noche</span>
+          <span class="px-2 py-0.5 rounded bg-[#CCFBF1] text-[#0F766E] font-medium">G24 = Guardia 24h</span>
+          <span class="px-2 py-0.5 rounded border border-[#16A34A] text-[#16A34A] font-semibold">⇄ Permutado</span>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-center border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]">
+              <th class="py-2.5 px-3 text-left font-semibold">Profesional (RGPD)</th>
+              <th class="py-2.5 px-2 font-semibold">18 Mié</th>
+              <th class="py-2.5 px-2 font-semibold">19 Jue</th>
+              <th class="py-2.5 px-2 font-semibold">20 Vie</th>
+              <th class="py-2.5 px-2 font-semibold">21 Sáb</th>
+              <th class="py-2.5 px-2 font-semibold">22 Dom</th>
+              <th class="py-2.5 px-2 font-semibold">23 Lun</th>
+              <th class="py-2.5 px-2 font-semibold">24 Mar</th>
+            </tr>
+          </thead>
+          <tbody id="roster-body" class="divide-y divide-[#E2E8F0]"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Registro de Auditoría Inmutable -->
+    <section class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-[#0F172A]">Registro automático de auditoría (Modificaciones de titularidad)</h2>
+        <span class="text-xs text-[#475569]">Trazabilidad inmutable</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]">
+              <th class="py-2 px-3 font-semibold">Fecha/Hora</th>
+              <th class="py-2 px-3 font-semibold">Tipo</th>
+              <th class="py-2 px-3 font-semibold">Implicados</th>
+              <th class="py-2 px-3 font-semibold">Validación</th>
+              <th class="py-2 px-3 font-semibold">Aprobado por</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#E2E8F0]">
+            <tr>
+              <td class="py-2.5 px-3 text-[#475569]">16/11/2026 13:15</td>
+              <td class="py-2.5 px-3 font-medium">Permuta P2P</td>
+              <td class="py-2.5 px-3 font-semibold">Carlos Ruiz (ENF-019) ↔ Ana Gil (ENF-024)</td>
+              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-[#DCFCE7] text-[#16A34A] font-medium">✓ Cumple 12h</span></td>
+              <td class="py-2.5 px-3 text-[#475569]">Dr. Martín Vega (SUP-008)</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-3 text-[#475569]">15/11/2026 19:42</td>
+              <td class="py-2.5 px-3 font-medium">Cobertura Urgente</td>
+              <td class="py-2.5 px-3 font-semibold">Baja ENF-031 → Asume Laura Gómez (ENF-042)</td>
+              <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-[#DCFCE7] text-[#16A34A] font-medium">✓ Cumple 12h</span></td>
+              <td class="py-2.5 px-3 text-[#475569]">Adjudicación Exprés (SUP-008)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const staff = [
+      {
+        name: "Laura Gómez (ENF-042)",
+        days: [
+          { code: "L", swap: false },
+          { code: "M", swap: false },
+          { code: "L", swap: false },
+          { code: "M", swap: true, info: "Cobertura urgente" },
+          { code: "G24", swap: false },
+          { code: "L", swap: false },
+          { code: "M", swap: false }
+        ]
+      },
+      {
+        name: "Carlos Ruiz (ENF-019)",
+        days: [
+          { code: "L", swap: true, info: "Antes: M (Permutado con ENF-024)" },
+          { code: "M", swap: false },
+          { code: "T", swap: false },
+          { code: "M", swap: true, info: "Asume de ENF-024" },
+          { code: "L", swap: false },
+          { code: "N", swap: false },
+          { code: "L", swap: false }
+        ]
+      },
+      {
+        name: "Ana Belén Gil (ENF-024)",
+        days: [
+          { code: "M", swap: true, info: "Asume de ENF-019" },
+          { code: "T", swap: false },
+          { code: "L", swap: false },
+          { code: "L", swap: true, info: "Antes: M (Permutado con ENF-019)" },
+          { code: "T", swap: false },
+          { code: "M", swap: false },
+          { code: "N", swap: false }
+        ]
+      },
+      {
+        name: "Elena Morales (ENF-014)",
+        days: [
+          { code: "N", swap: false },
+          { code: "L", swap: false },
+          { code: "M", swap: false },
+          { code: "T", swap: false },
+          { code: "L", swap: false },
+          { code: "T", swap: false },
+          { code: "T", swap: false }
+        ]
+      }
+    ];
+
+    const cellStyle = {
+      "M": "bg-[#DBEAFE] text-[#1D4ED8]",
+      "T": "bg-[#E0E7FF] text-[#4338CA]",
+      "N": "bg-[#FEF3C7] text-[#B45309]",
+      "G24": "bg-[#CCFBF1] text-[#0F766E]",
+      "L": "bg-[#F1F5F9] text-[#64748B]"
+    };
+
+    function renderRoster() {
+      const tbody = document.getElementById("roster-body");
+      tbody.innerHTML = staff.map(person => `
+        <tr>
+          <td class="py-3 px-3 text-left font-semibold text-[#0F172A] whitespace-nowrap">${person.name}</td>
+          ${person.days.map(d => `
+            <td class="py-2 px-1.5" title="${d.info || "Planificación base"}">
+              <div class="inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-md font-semibold ${cellStyle[d.code]} ${d.swap ? "ring-2 ring-[#16A34A]" : ""}">
+                <span>${d.code}</span>
+                ${d.swap ? `<span class="text-[#16A34A] text-[10px]">⇄</span>` : ""}
+              </div>
+            </td>
+          `).join("")}
+        </tr>
+      `).join("");
+    }
+
+    function exportDoc(format) {
+      const toast = document.getElementById("export-toast");
+      toast.classList.remove("hidden");
+      toast.textContent = `✓ Cuadrante oficial de Urgencias (Noviembre 2026) exportado correctamente en formato ${format} listo para Dirección y RRHH.`;
+    }
+
+    renderRoster();
+  </script>
+</body>
+</html>

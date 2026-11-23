@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnoMed · WU-14 Auditoría y Certificados Legales</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased m-0 p-0">
+
+  <!-- Banner Superior Común -->
+  <header class="bg-[#0F4C81] text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[#0D9488] text-white flex items-center justify-center font-bold text-base shadow-inner">+</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold tracking-tight">TurnoMed</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-white/15 text-white/95 font-medium">Hospital Universitario · Dirección</span>
+          </div>
+          <p class="text-xs text-blue-100">Gestión Inteligente de Turnos y Guardias Sanitarias</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap items-center gap-1 text-xs">
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Dashboard B2B</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Convenios y Reglas</span>
+        <span class="px-3 py-1.5 rounded-md bg-white text-[#0F4C81] font-semibold shadow-sm cursor-default">Auditoría Legal</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Personal y Servicios</span>
+      </nav>
+
+      <div class="flex items-center gap-3 text-xs">
+        <div class="px-2.5 py-1 rounded-md bg-[#0D9488] text-white font-medium">Rol: RRHH / Supervisor</div>
+        <div class="text-right leading-tight">
+          <div class="font-semibold">Elena Torres</div>
+          <div class="text-blue-100">Dirección RRHH · RRHH-002</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Título -->
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div>
+        <h1 class="text-lg font-bold text-[#0F172A]">Auditoría de permutas y certificados de trazabilidad legal</h1>
+        <p class="text-xs text-[#475569]">Consulta el histórico inmutable de intercambios y emite certificados PDF válidos ante Inspección de Trabajo.</p>
+      </div>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-[#E0F2FE] text-[#0F4C81] font-semibold border border-[#BAE6FD]">WU-14 · Supervisor / RRHH</span>
+    </div>
+
+    <!-- Filtros y Columnas -->
+    <section class="bg-white border border-[#E2E8F0] rounded-xl p-4 shadow-sm space-y-3 text-xs">
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <input id="q-search" type="text" oninput="renderAudit()" placeholder="Buscar sanitario o código RGPD..."
+          class="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white" />
+        <select id="q-unit" onchange="renderAudit()" class="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white">
+          <option value="all">Todas las unidades</option>
+          <option value="Urgencias">Urgencias</option>
+          <option value="UCI">UCI</option>
+        </select>
+        <select id="q-status" onchange="renderAudit()" class="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white">
+          <option value="all">Todos los estados</option>
+          <option value="Aprobada">Aprobada</option>
+          <option value="Rechazada">Rechazada</option>
+        </select>
+        <button type="button" onclick="toggleCol('showApprover')"
+          class="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] font-semibold text-[#0F172A] hover:border-[#0F4C81] cursor-pointer">
+          Mostrar/Ocultar Col. Aprobador
+        </button>
+      </div>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Tabla de Auditoría -->
+      <section class="lg:col-span-8 bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-3">
+        <h2 class="text-sm font-semibold text-[#0F172A]">Registro Histórico de Permutas y Coberturas</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]">
+                <th class="py-2 px-3 font-semibold">Fecha Guardia</th>
+                <th class="py-2 px-3 font-semibold">Implicados</th>
+                <th class="py-2 px-3 font-semibold">Descanso 12h</th>
+                <th id="th-approver" class="py-2 px-3 font-semibold">Aprobador</th>
+                <th class="py-2 px-3 font-semibold">Estado</th>
+                <th class="py-2 px-3 font-semibold text-right">Certificado</th>
+              </tr>
+            </thead>
+            <tbody id="audit-body" class="divide-y divide-[#E2E8F0]"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Vista Previa Certificado PDF -->
+      <aside class="lg:col-span-4 bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-[#0F172A]">Certificado de Trazabilidad</h2>
+          <span class="text-xs px-2 py-0.5 rounded bg-[#F1F5F9] text-[#475569] font-medium">PDF Oficial</span>
+        </div>
+
+        <div id="cert-preview" class="p-4 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] space-y-2 text-xs"></div>
+
+        <button type="button" onclick="downloadCert()"
+          class="w-full px-4 py-2.5 rounded-lg bg-[#0F4C81] text-white text-xs font-semibold hover:bg-[#0B3B66] cursor-pointer">
+          Descargar Certificado PDF
+        </button>
+        <div id="cert-toast" class="hidden p-3 rounded-lg border border-[#BBF7D0] bg-[#DCFCE7] text-[#16A34A] text-xs font-medium"></div>
+      </aside>
+
+    </div>
+
+  </main>
+
+  <script>
+    const records = [
+      {
+        id: "TRZ-2026-0891",
+        date: "18 Nov 2026",
+        unit: "Urgencias",
+        pair: "ENF-019 ↔ ENF-024",
+        names: "Carlos Ruiz ↔ Ana Belén Gil",
+        restDetail: "ENF-019: 19h prev / 24h post · ENF-024: 17h prev / 18h post",
+        approver: "Dr. Martín Vega (SUP-008)",
+        timestamp: "16/11/2026 13:15:04 UTC",
+        status: "Aprobada"
+      },
+      {
+        id: "TRZ-2026-0887",
+        date: "15 Nov 2026",
+        unit: "Urgencias",
+        pair: "ENF-031 → ENF-042",
+        names: "Marta Sánchez → Laura Gómez (Baja urgente)",
+        restDetail: "ENF-042: 24h prev / 16h post (Cumple 12h)",
+        approver: "Adjudicación Exprés (SUP-008)",
+        timestamp: "15/11/2026 19:42:11 UTC",
+        status: "Aprobada"
+      },
+      {
+        id: "TRZ-2026-0879",
+        date: "12 Nov 2026",
+        unit: "UCI",
+        pair: "MIR-005 ↔ MIR-009",
+        names: "Dr. Iván Soto ↔ Dra. Lucía Marín",
+        restDetail: "Rechazada por necesidades asistenciales de guardia",
+        approver: "Dra. Carmen Díez (SUP-012)",
+        timestamp: "11/11/2026 10:08:39 UTC",
+        status: "Rechazada"
+      }
+    ];
+
+    let showApprover = true;
+    let selectedId = records[0].id;
+
+    function toggleCol() {
+      showApprover = !showApprover;
+      document.getElementById("th-approver").style.display = showApprover ? "" : "none";
+      renderAudit();
+    }
+
+    function selectRecord(id) {
+      selectedId = id;
+      document.getElementById("cert-toast").classList.add("hidden");
+      renderCert();
+    }
+
+    function downloadCert() {
+      const t = document.getElementById("cert-toast");
+      t.classList.remove("hidden");
+      t.textContent = `✓ Certificado ${selectedId}.pdf generado con sello temporal y desglose de descanso de 12h.`;
+    }
+
+    function renderCert() {
+      const r = records.find(x => x.id === selectedId);
+      document.getElementById("cert-preview").innerHTML = `
+        <div class="font-bold text-[#0F4C81] border-b border-[#E2E8F0] pb-2">CERTIFICADO DE TRAZABILIDAD · ${r.id}</div>
+        <div><strong>Unidad:</strong> ${r.unit}</div>
+        <div><strong>Fecha Turno:</strong> ${r.date}</div>
+        <div><strong>Implicados:</strong> ${r.names} (${r.pair})</div>
+        <div><strong>Verificación 12h:</strong> ${r.restDetail}</div>
+        <div><strong>Resolución:</strong> ${r.status} por ${r.approver}</div>
+        <div><strong>Sello temporal:</strong> ${r.timestamp}</div>
+      `;
+    }
+
+    function renderAudit() {
+      const q = document.getElementById("q-search").value.toLowerCase();
+      const u = document.getElementById("q-unit").value;
+      const st = document.getElementById("q-status").value;
+
+      const filtered = records.filter(r =>
+        (u === "all" || r.unit === u) &&
+        (st === "all" || r.status === st) &&
+        (r.names.toLowerCase().includes(q) || r.pair.toLowerCase().includes(q) || r.id.toLowerCase().includes(q))
+      );
+
+      document.getElementById("audit-body").innerHTML = filtered.map(r => `
+        <tr class="hover:bg-[#F8FAFC]">
+          <td class="py-2.5 px-3 font-medium text-[#0F172A] whitespace-nowrap">${r.date}</td>
+          <td class="py-2.5 px-3">
+            <div class="font-semibold text-[#0F172A]">${r.names}</div>
+            <div class="text-[#475569]">${r.unit} · ${r.id}</div>
+          </td>
+          <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded bg-[#DCFCE7] text-[#16A34A] font-medium">✓ Verificado 12h</span></td>
+          <td class="py-2.5 px-3 text-[#475569]" style="display:${showApprover ? "" : "none"}">${r.approver}</td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded-full font-semibold ${r.status === "Aprobada" ? "bg-[#DCFCE7] text-[#16A34A]" : "bg-[#FEE2E2] text-[#DC2626]"}">${r.status}</span>
+          </td>
+          <td class="py-2.5 px-3 text-right">
+            <button type="button" onclick="selectRecord('${r.id}')" class="text-[#0F4C81] font-semibold hover:underline cursor-pointer">Ver PDF</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    renderAudit();
+    renderCert();
+  </script>
+</body>
+</html>

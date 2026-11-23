@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnoMed · WU-11 Avisos y Comunicados de Planta</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased m-0 p-0">
+
+  <!-- Banner Superior Común -->
+  <header class="bg-[#0F4C81] text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[#0D9488] text-white flex items-center justify-center font-bold text-base shadow-inner">+</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold tracking-tight">TurnoMed</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-white/15 text-white/95 font-medium">Hospital Universitario · Urgencias</span>
+          </div>
+          <p class="text-xs text-blue-100">Gestión Inteligente de Turnos y Guardias Sanitarias</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap items-center gap-1 text-xs">
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Cuadrante Oficial</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Bandeja Aprobación</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Bajas Urgentes</span>
+        <span class="px-3 py-1.5 rounded-md bg-white text-[#0F4C81] font-semibold shadow-sm cursor-default">Avisos Planta</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Fair-Play</span>
+      </nav>
+
+      <div class="flex items-center gap-3 text-xs">
+        <div class="px-2.5 py-1 rounded-md bg-[#0D9488] text-white font-medium">Rol: Supervisor</div>
+        <div class="text-right leading-tight">
+          <div class="font-semibold">Dr. Martín Vega</div>
+          <div class="text-blue-100">Supervisor Planta · SUP-008</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Título -->
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div>
+        <h1 class="text-lg font-bold text-[#0F172A]">Gestión de avisos y comunicados de planta</h1>
+        <p class="text-xs text-[#475569]">Redacta comunicados internos, guárdalos en borrador o envíalos por push y email a grupos filtrados.</p>
+      </div>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-[#E0F2FE] text-[#0F4C81] font-semibold border border-[#BAE6FD]">WU-11 · Supervisor</span>
+    </div>
+
+    <div id="notice-feedback" class="hidden p-3.5 rounded-xl text-xs font-medium border"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Formulario de Aviso -->
+      <section class="lg:col-span-5 bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+        <h2 class="text-sm font-semibold text-[#0F172A]">Nuevo aviso / Editar borrador</h2>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="font-semibold text-[#0F172A] block mb-1">Destinatarios</label>
+            <select id="notice-target" class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white">
+              <option value="Toda la planta de Urgencias">Toda la planta de Urgencias</option>
+              <option value="Solo Enfermería (Urgencias)">Solo Enfermería (Urgencias)</option>
+              <option value="Solo Médicos Residentes (MIR)">Solo Médicos Residentes (MIR)</option>
+              <option value="Solo Médicos Adjuntos">Solo Médicos Adjuntos</option>
+              <option value="Asignados el 24-25 Noviembre">Sanitarios asignados el 24–25 Noviembre</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-semibold text-[#0F172A] block mb-1">Asunto / Encabezado</label>
+            <input id="notice-subject" type="text" placeholder="Ej. Refuerzo protocolo triaje puente de diciembre"
+              class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white" />
+          </div>
+          <div>
+            <label class="font-semibold text-[#0F172A] block mb-1">Mensaje (Notificación Push + Email)</label>
+            <textarea id="notice-body" rows="4" placeholder="Escribe el comunicado para el equipo..."
+              class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white resize-none"></textarea>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <button type="button" onclick="saveNotice(false)"
+            class="flex-1 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs font-semibold text-[#0F172A] hover:border-[#0F4C81] cursor-pointer">
+            Guardar borrador
+          </button>
+          <button type="button" onclick="saveNotice(true)"
+            class="flex-1 px-3 py-2 rounded-lg bg-[#0F4C81] text-white text-xs font-semibold hover:bg-[#0B3B66] cursor-pointer">
+            Enviar aviso ahora
+          </button>
+        </div>
+      </section>
+
+      <!-- Registro de Avisos y Borradores -->
+      <section class="lg:col-span-7 bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-[#0F172A]">Registro histórico y borradores en preparación</h2>
+          <span class="text-xs text-[#475569]">Solo eliminables si no enviados</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]">
+                <th class="py-2 px-3 font-semibold">Fecha</th>
+                <th class="py-2 px-3 font-semibold">Asunto y Destinatarios</th>
+                <th class="py-2 px-3 font-semibold">Estado</th>
+                <th class="py-2 px-3 font-semibold text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="notices-body" class="divide-y divide-[#E2E8F0]"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <script>
+    let editingId = null;
+    let notices = [
+      {
+        id: 1,
+        date: "16 Nov 11:00",
+        subject: "Apertura plazo solicitudes de Navidad",
+        target: "Toda la planta de Urgencias",
+        body: "Recordad publicar vuestras preferencias antes del día 25.",
+        sent: true
+      },
+      {
+        id: 2,
+        date: "En borrador",
+        subject: "Reorganización box críticos turno noche",
+        target: "Solo Enfermería (Urgencias)",
+        body: "Borrador pendiente de confirmar horario de sesión clínica.",
+        sent: false
+      }
+    ];
+
+    function showToast(msg, ok) {
+      const el = document.getElementById("notice-feedback");
+      el.classList.remove("hidden");
+      el.className = ok
+        ? "p-3.5 rounded-xl text-xs font-medium border border-[#BBF7D0] text-[#16A34A] bg-[#DCFCE7]"
+        : "p-3.5 rounded-xl text-xs font-medium border border-[#FECACA] text-[#DC2626] bg-[#FEE2E2]";
+      el.textContent = msg;
+    }
+
+    function saveNotice(sendNow) {
+      const target = document.getElementById("notice-target").value;
+      const subject = document.getElementById("notice-subject").value.trim();
+      const body = document.getElementById("notice-body").value.trim();
+
+      if (!subject || !body) {
+        return showToast("Completa el asunto y el mensaje del aviso antes de continuar.", false);
+      }
+
+      const dateStr = sendNow ? "16 Nov (Ahora)" : "En borrador";
+      if (editingId) {
+        notices = notices.map(n => n.id === editingId ? { ...n, target, subject, body, sent: sendNow, date: dateStr } : n);
+        editingId = null;
+      } else {
+        notices.unshift({ id: Date.now(), date: dateStr, subject, target, body, sent: sendNow });
+      }
+
+      document.getElementById("notice-subject").value = "";
+      document.getElementById("notice-body").value = "";
+      render();
+      showToast(sendNow ? `Aviso enviado por Push y Email a "${target}".` : "Aviso guardado en borrador para editarlo más tarde.", true);
+    }
+
+    function editDraft(id) {
+      const n = notices.find(x => x.id === id);
+      if (!n || n.sent) return;
+      editingId = id;
+      document.getElementById("notice-target").value = n.target;
+      document.getElementById("notice-subject").value = n.subject;
+      document.getElementById("notice-body").value = n.body;
+    }
+
+    function deleteDraft(id) {
+      const n = notices.find(x => x.id === id);
+      if (!n || n.sent) return showToast("No se puede eliminar un aviso que ya ha sido enviado.", false);
+      notices = notices.filter(x => x.id !== id);
+      render();
+      showToast("Borrador eliminado correctamente.", true);
+    }
+
+    function render() {
+      const tbody = document.getElementById("notices-body");
+      tbody.innerHTML = notices.map(n => `
+        <tr>
+          <td class="py-2.5 px-3 text-[#475569] whitespace-nowrap">${n.date}</td>
+          <td class="py-2.5 px-3">
+            <div class="font-semibold text-[#0F172A]">${n.subject}</div>
+            <div class="text-[#475569]">Para: ${n.target}</div>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded-full font-semibold ${n.sent ? "bg-[#DCFCE7] text-[#16A34A]" : "bg-[#FEF3C7] text-[#D97706]"}">
+              ${n.sent ? "Enviado" : "Borrador"}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-right whitespace-nowrap">
+            ${!n.sent ? `
+              <button type="button" onclick="editDraft(${n.id})" class="text-[#0F4C81] font-semibold mr-2 cursor-pointer">Editar</button>
+              <button type="button" onclick="deleteDraft(${n.id})" class="text-[#DC2626] font-semibold cursor-pointer">Eliminar</button>
+            ` : `<span class="text-[#94A3B8]">Solo lectura</span>`}
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    render();
+  </script>
+</body>
+</html>

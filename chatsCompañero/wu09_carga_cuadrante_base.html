@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnoMed · WU-09 Carga Cuadrante Base</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased m-0 p-0">
+
+  <!-- Banner Superior Común -->
+  <header class="bg-[#0F4C81] text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[#0D9488] text-white flex items-center justify-center font-bold text-base shadow-inner">+</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold tracking-tight">TurnoMed</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-white/15 text-white/95 font-medium">Hospital Universitario · Urgencias</span>
+          </div>
+          <p class="text-xs text-blue-100">Gestión Inteligente de Turnos y Guardias Sanitarias</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap items-center gap-1 text-xs">
+        <span class="px-3 py-1.5 rounded-md bg-white text-[#0F4C81] font-semibold shadow-sm cursor-default">Cuadrante Base</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Bandeja Aprobación</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Bajas Urgentes</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Avisos Planta</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Fair-Play</span>
+      </nav>
+
+      <div class="flex items-center gap-3 text-xs">
+        <div class="px-2.5 py-1 rounded-md bg-[#0D9488] text-white font-medium">Rol: Supervisor</div>
+        <div class="text-right leading-tight">
+          <div class="font-semibold">Dr. Martín Vega</div>
+          <div class="text-blue-100">Supervisor Planta · SUP-008</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Título -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="text-lg font-bold text-[#0F172A]">Carga y gestión del cuadrante base mensual del servicio</h1>
+        <p class="text-xs text-[#475569]">Importa desde Excel/CSV o edita manualmente; el sistema verifica descansos de 12h y dotación mínima antes de publicar.</p>
+      </div>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-[#E0F2FE] text-[#0F4C81] font-semibold border border-[#BAE6FD]">WU-09 · Supervisor</span>
+    </div>
+
+    <!-- Barra de acciones -->
+    <section class="bg-white border border-[#E2E8F0] rounded-xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" onclick="simulateImport()"
+          class="px-3.5 py-2 rounded-lg border border-[#0F4C81] text-[#0F4C81] bg-[#F0F9FF] font-semibold hover:bg-[#E0F2FE] cursor-pointer">
+          Importar plantilla Excel/CSV
+        </button>
+        <button type="button" onclick="fixAlerts()"
+          class="px-3.5 py-2 rounded-lg border border-[#E2E8F0] text-[#0F172A] bg-white font-semibold hover:border-[#0F4C81] cursor-pointer">
+          Auto-corregir conflictos detectados
+        </button>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <span id="draft-badge" class="px-2.5 py-1 rounded-full bg-[#FEF3C7] text-[#D97706] font-semibold">Estado: Borrador</span>
+        <button type="button" onclick="saveDraft()"
+          class="px-3.5 py-2 rounded-lg border border-[#E2E8F0] bg-white text-[#475569] font-semibold hover:border-[#94A3B8] cursor-pointer">
+          Guardar borrador
+        </button>
+        <button type="button" onclick="publishRoster()"
+          class="px-4 py-2 rounded-lg bg-[#0F4C81] text-white font-semibold hover:bg-[#0B3B66] shadow-sm cursor-pointer">
+          Publicar cuadrante oficial
+        </button>
+      </div>
+    </section>
+
+    <!-- Panel de Alertas Automáticas -->
+    <div id="alerts-box" class="space-y-2"></div>
+
+    <!-- Cuadrícula Editable -->
+    <section class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+        <h2 class="text-sm font-semibold text-[#0F172A]">Planificación Base · Diciembre 2026 (Haz clic en una celda para rotar turno: M → T → N → G24 → L)</h2>
+        <span class="text-[#475569]">Dotación mínima requerida por día: 1M, 1T, 1N</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-center border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]">
+              <th class="py-2.5 px-3 text-left font-semibold">Sanitario</th>
+              <th class="py-2.5 px-2 font-semibold">01 Mar</th>
+              <th class="py-2.5 px-2 font-semibold">02 Mié</th>
+              <th class="py-2.5 px-2 font-semibold">03 Jue</th>
+              <th class="py-2.5 px-2 font-semibold">04 Vie</th>
+              <th class="py-2.5 px-2 font-semibold">05 Sáb</th>
+            </tr>
+          </thead>
+          <tbody id="grid-body" class="divide-y divide-[#E2E8F0]"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const cycle = ["M", "T", "N", "G24", "L"];
+    const styleMap = {
+      "M": "bg-[#DBEAFE] text-[#1D4ED8]",
+      "T": "bg-[#E0E7FF] text-[#4338CA]",
+      "N": "bg-[#FEF3C7] text-[#B45309]",
+      "G24": "bg-[#CCFBF1] text-[#0F766E]",
+      "L": "bg-[#F1F5F9] text-[#64748B]"
+    };
+
+    // Row 1 intentionally has N followed by M (12h violation!) and Day 4 lacks N (minimum staffing alert)
+    let grid = [
+      { name: "Laura Gómez (ENF-042)", days: ["M", "T", "L", "M", "G24"] },
+      { name: "Carlos Ruiz (ENF-019)", days: ["N", "M", "T", "L", "M"] }, // N -> M = <12h!
+      { name: "Elena Morales (ENF-014)", days: ["T", "N", "L", "T", "N"] },
+      { name: "David López (ENF-055)", days: ["L", "L", "N", "L", "T"] }
+    ];
+
+    function evaluate() {
+      const restIssues = [];
+      const staffingIssues = [];
+
+      grid.forEach((person, rIdx) => {
+        for (let d = 0; d < person.days.length - 1; d++) {
+          const cur = person.days[d];
+          const nxt = person.days[d + 1];
+          // N (ends 08:00 next day) followed by M (starts 08:00) or T (starts 15:00 -> 7h)
+          if ((cur === "N" || cur === "G24") && (nxt === "M" || nxt === "T")) {
+            restIssues.push({ row: rIdx, col: d + 1, msg: `${person.name}: encadena ${cur} (día ${d+1}) con ${nxt} (día ${d+2}) → incumple 12h de descanso.` });
+          }
+        }
+      });
+
+      for (let d = 0; d < 5; d++) {
+        const colShifts = grid.map(p => p.days[d]);
+        const hasM = colShifts.includes("M") || colShifts.includes("G24");
+        const hasT = colShifts.includes("T") || colShifts.includes("G24");
+        const hasN = colShifts.includes("N") || colShifts.includes("G24");
+        const missing = [];
+        if (!hasM) missing.push("Mañana");
+        if (!hasT) missing.push("Tarde");
+        if (!hasN) missing.push("Noche");
+        if (missing.length > 0) {
+          staffingIssues.push(`Día 0${d+1} Dic: dotación mínima descubierta en franja(s): ${missing.join(", ")}.`);
+        }
+      }
+
+      return { restIssues, staffingIssues };
+    }
+
+    function toggleCell(r, c) {
+      const cur = grid[r].days[c];
+      const next = cycle[(cycle.indexOf(cur) + 1) % cycle.length];
+      grid[r].days[c] = next;
+      render();
+    }
+
+    function fixAlerts() {
+      grid[1].days[1] = "L"; // Fix N -> M
+      grid[3].days[3] = "N"; // Fix missing N on day 4
+      render();
+    }
+
+    function simulateImport() {
+      alert("Plantilla 'cuadrante_urgencias_dic2026.xlsx' cargada en memoria. Revisa las alertas antes de publicar.");
+    }
+
+    function saveDraft() {
+      const b = document.getElementById("draft-badge");
+      b.textContent = "Estado: Borrador guardado";
+      b.className = "px-2.5 py-1 rounded-full bg-[#FEF3C7] text-[#D97706] font-semibold";
+    }
+
+    function publishRoster() {
+      const { restIssues, staffingIssues } = evaluate();
+      if (restIssues.length > 0 || staffingIssues.length > 0) {
+        alert("No es recomendable publicar con alertas críticas de descanso (<12h) o dotación descubierta. Corrige las celdas resaltadas primero.");
+        return;
+      }
+      const b = document.getElementById("draft-badge");
+      b.textContent = "Estado: Publicado Oficialmente ✓";
+      b.className = "px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#16A34A] font-semibold";
+    }
+
+    function render() {
+      const { restIssues, staffingIssues } = evaluate();
+      const alertsBox = document.getElementById("alerts-box");
+      let alertHtml = "";
+
+      if (restIssues.length === 0 && staffingIssues.length === 0) {
+        alertHtml = `<div class="p-3.5 rounded-xl border border-[#BBF7D0] bg-[#DCFCE7] text-[#16A34A] text-xs font-semibold">✓ Cuadrante base válido: 0 infracciones de las 12 horas y todas las franjas cubiertas.</div>`;
+      } else {
+        restIssues.forEach(i => {
+          alertHtml += `<div class="p-3 rounded-xl border border-[#FECACA] bg-[#FEE2E2] text-[#DC2626] text-xs font-medium">✕ Infracción 12h: ${i.msg}</div>`;
+        });
+        staffingIssues.forEach(m => {
+          alertHtml += `<div class="p-3 rounded-xl border border-[#FDE68A] bg-[#FEF3C7] text-[#D97706] text-xs font-medium">⚠ Dotación mínima: ${m}</div>`;
+        });
+      }
+      alertsBox.innerHTML = alertHtml;
+
+      const tbody = document.getElementById("grid-body");
+      tbody.innerHTML = grid.map((person, rIdx) => `
+        <tr>
+          <td class="py-2.5 px-3 text-left font-semibold text-[#0F172A] whitespace-nowrap">${person.name}</td>
+          ${person.days.map((code, cIdx) => {
+            const hasConflict = restIssues.some(x => x.row === rIdx && x.col === cIdx);
+            return `
+              <td class="py-2 px-1.5">
+                <button type="button" onclick="toggleCell(${rIdx}, ${cIdx})"
+                  class="w-16 py-1.5 rounded-md font-semibold cursor-pointer transition ${styleMap[code]} ${hasConflict ? "ring-2 ring-[#DC2626]" : "hover:opacity-80"}">
+                  ${code}${hasConflict ? " ⚠" : ""}
+                </button>
+              </td>
+            `;
+          }).join("")}
+        </tr>
+      `).join("");
+    }
+
+    render();
+  </script>
+</body>
+</html>

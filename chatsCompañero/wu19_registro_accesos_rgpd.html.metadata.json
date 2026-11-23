@@ -1,0 +1,5 @@
+{
+  "summary": "Prototipo interactivo WU-19 (Registro de accesos al sistema Seguridad RGPD) con listado cronológico login/logout, userid seudonimizado, rol e intentos fallidos filtrables.",
+  "updatedAt": "2026-11-16T13:06:19.084732400Z",
+  "userFacing": true
+}

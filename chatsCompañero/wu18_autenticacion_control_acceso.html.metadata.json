@@ -1,0 +1,5 @@
+{
+  "summary": "Prototipo interactivo WU-18 (Autenticación y control de acceso) con login userid/contraseña, selector de rol tras autenticar si el usuario es multi-rol, bloqueo por intentos fallidos y recuperación por email.",
+  "updatedAt": "2026-11-16T13:06:17.653225100Z",
+  "userFacing": true
+}

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnoMed · WU-07 Calendario Personal y Sincronización</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased m-0 p-0">
+
+  <!-- Banner Superior Común -->
+  <header class="bg-[#0F4C81] text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[#0D9488] text-white flex items-center justify-center font-bold text-base shadow-inner">+</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold tracking-tight">TurnoMed</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-white/15 text-white/95 font-medium">Hospital Universitario · Urgencias</span>
+          </div>
+          <p class="text-xs text-blue-100">Gestión Inteligente de Turnos y Guardias Sanitarias</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap items-center gap-1 text-xs">
+        <span class="px-3 py-1.5 rounded-md bg-white text-[#0F4C81] font-semibold shadow-sm cursor-default">Mi Calendario</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Publicar Guardia</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Tablón P2P</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Panel Supervisor</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Fair-Play</span>
+      </nav>
+
+      <div class="flex items-center gap-3 text-xs">
+        <div class="px-2.5 py-1 rounded-md bg-[#0D9488] text-white font-medium">Fair-Play: +1</div>
+        <div class="text-right leading-tight">
+          <div class="font-semibold">Laura Gómez</div>
+          <div class="text-blue-100">Enfermería · ENF-042</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Título y Selector de Vista -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="text-lg font-bold text-[#0F172A]">Calendario personal interactivo y sincronización externa</h1>
+        <p class="text-xs text-[#475569]">Consulta tus turnos en vista mensual o semanal y mantenlos sincronizados con Google Calendar / iCal.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs px-2.5 py-1 rounded-full bg-[#E0F2FE] text-[#0F4C81] font-semibold border border-[#BAE6FD]">WU-07 · Sanitario</span>
+        <div class="inline-flex rounded-lg border border-[#E2E8F0] bg-white p-0.5 text-xs">
+          <button id="btn-month" type="button" onclick="setView('month')" class="px-3 py-1.5 rounded-md font-semibold cursor-pointer">Mensual</button>
+          <button id="btn-week" type="button" onclick="setView('week')" class="px-3 py-1.5 rounded-md font-semibold cursor-pointer">Semanal</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Calendario Principal -->
+      <section class="lg:col-span-8 bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-sm font-semibold text-[#0F172A]" id="cal-title">Noviembre 2026</h2>
+          <div class="flex flex-wrap gap-2 text-xs text-[#475569]">
+            <span class="px-2 py-0.5 rounded bg-[#DBEAFE] text-[#1D4ED8] font-medium">Mañana</span>
+            <span class="px-2 py-0.5 rounded bg-[#E0E7FF] text-[#4338CA] font-medium">Tarde</span>
+            <span class="px-2 py-0.5 rounded bg-[#FEF3C7] text-[#B45309] font-medium">Noche</span>
+            <span class="px-2 py-0.5 rounded bg-[#CCFBF1] text-[#0F766E] font-medium">Guardia 24h</span>
+          </div>
+        </div>
+
+        <div id="calendar-container"></div>
+      </section>
+
+      <!-- Sincronización Externa -->
+      <aside class="lg:col-span-4 space-y-4">
+        <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+          <div>
+            <h2 class="text-sm font-semibold text-[#0F172A]">Sincronización en tiempo real</h2>
+            <p class="text-xs text-[#475569]">Los cambios aprobados por el supervisor se reflejan automáticamente.</p>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <label class="font-semibold text-[#0F172A] block">Enlace de suscripción iCal (.ics)</label>
+            <div class="flex gap-2">
+              <input id="ical-url" type="text" readonly value="https://app.turnomed.es/cal/ENF-042/feed.ics"
+                class="flex-1 px-2.5 py-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-[#475569] text-xs" />
+              <button type="button" onclick="copyIcal()"
+                class="px-3 py-2 rounded-lg bg-[#0F4C81] text-white font-semibold hover:bg-[#0B3B66] cursor-pointer">
+                Copiar
+              </button>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-[#E2E8F0] space-y-2.5">
+            <button type="button" onclick="toggleGoogleSync()" id="btn-google"
+              class="w-full px-4 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-xs font-semibold text-[#0F172A] hover:border-[#0F4C81] transition cursor-pointer flex items-center justify-center gap-2">
+              <span>Conectar con Google Calendar</span>
+            </button>
+            <button type="button" onclick="showSyncToast('Archivo .ics descargado para Apple Calendar / Outlook.')"
+              class="w-full px-4 py-2.5 rounded-lg bg-[#0D9488] text-white text-xs font-semibold hover:opacity-90 transition cursor-pointer">
+              Exportar calendario (.ics)
+            </button>
+          </div>
+
+          <div id="sync-toast" class="hidden p-3 rounded-lg border border-[#BBF7D0] bg-[#DCFCE7] text-[#16A34A] text-xs font-medium"></div>
+        </div>
+
+        <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-2 text-xs">
+          <h3 class="font-semibold text-[#0F172A]">Detalle del día seleccionado</h3>
+          <div id="day-detail" class="text-[#475569]">Haz clic en cualquier turno del calendario para ver su estado.</div>
+        </div>
+      </aside>
+
+    </div>
+
+  </main>
+
+  <script>
+    const shiftStyles = {
+      "Mañana": "bg-[#DBEAFE] text-[#1D4ED8]",
+      "Tarde": "bg-[#E0E7FF] text-[#4338CA]",
+      "Noche": "bg-[#FEF3C7] text-[#B45309]",
+      "Guardia 24h": "bg-[#CCFBF1] text-[#0F766E]"
+    };
+
+    const novemberShifts = {
+      16: { type: "Mañana", hours: "08:00–15:00", state: "Confirmado" },
+      19: { type: "Mañana", hours: "08:00–15:00", state: "Confirmado" },
+      21: { type: "Mañana", hours: "08:00–15:00", state: "Permutado (Aprobado)" },
+      22: { type: "Guardia 24h", hours: "08:00–08:00", state: "Confirmado" },
+      25: { type: "Tarde", hours: "15:00–22:00", state: "Ofertado en tablón" },
+      27: { type: "Tarde", hours: "15:00–22:00", state: "Pendiente Supervisor" },
+      28: { type: "Noche", hours: "22:00–08:00", state: "Confirmado" }
+    };
+
+    let currentView = "month";
+    let googleConnected = false;
+
+    function setView(v) {
+      currentView = v;
+      const bm = document.getElementById("btn-month");
+      const bw = document.getElementById("btn-week");
+      bm.className = v === "month" ? "px-3 py-1.5 rounded-md bg-[#0F4C81] text-white font-semibold cursor-pointer" : "px-3 py-1.5 rounded-md text-[#475569] font-semibold cursor-pointer";
+      bw.className = v === "week" ? "px-3 py-1.5 rounded-md bg-[#0F4C81] text-white font-semibold cursor-pointer" : "px-3 py-1.5 rounded-md text-[#475569] font-semibold cursor-pointer";
+      renderCalendar();
+    }
+
+    function selectDay(day) {
+      const s = novemberShifts[day];
+      const box = document.getElementById("day-detail");
+      if (!s) {
+        box.innerHTML = `<strong>${day} de Noviembre:</strong> Día libre sin turno asignado.`;
+      } else {
+        box.innerHTML = `
+          <div class="space-y-1">
+            <div><strong>${day} de Noviembre · ${s.type}</strong> (${s.hours})</div>
+            <div>Unidad: Urgencias · Enfermería</div>
+            <div>Estado: <span class="font-semibold text-[#0F4C81]">${s.state}</span></div>
+          </div>
+        `;
+      }
+    }
+
+    function renderCalendar() {
+      const container = document.getElementById("calendar-container");
+      const daysHeaders = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+
+      if (currentView === "month") {
+        document.getElementById("cal-title").textContent = "Noviembre 2026 (Vista Mensual)";
+        // Nov 1 2026 is Sunday -> 6 empty slots before day 1
+        let html = `<div class="grid grid-cols-7 gap-1.5 text-xs text-center mb-2 font-semibold text-[#475569]">${daysHeaders.map(d => `<div>${d}</div>`).join("")}</div>`;
+        html += `<div class="grid grid-cols-7 gap-1.5 text-xs">`;
+        for (let i = 0; i < 6; i++) html += `<div class="h-16 rounded-lg bg-[#F8FAFC]"></div>`;
+        for (let d = 1; d <= 30; d++) {
+          const s = novemberShifts[d];
+          html += `
+            <button type="button" onclick="selectDay(${d})"
+              class="h-16 p-1.5 rounded-lg border border-[#E2E8F0] bg-white hover:border-[#0F4C81] text-left flex flex-col justify-between cursor-pointer transition">
+              <span class="font-semibold text-[#0F172A]">${d}</span>
+              ${s ? `<span class="px-1.5 py-0.5 rounded text-[11px] font-semibold truncate ${shiftStyles[s.type]}">${s.type === "Guardia 24h" ? "24h" : s.type}</span>` : `<span class="text-[11px] text-[#94A3B8]">Libre</span>`}
+            </button>
+          `;
+        }
+        html += `</div>`;
+        container.innerHTML = html;
+      } else {
+        document.getElementById("cal-title").textContent = "Semana del 23 al 29 de Noviembre 2026";
+        const weekDays = [23, 24, 25, 26, 27, 28, 29];
+        container.innerHTML = `
+          <div class="space-y-2.5">
+            ${weekDays.map((d, i) => {
+              const s = novemberShifts[d];
+              return `
+                <div onclick="selectDay(${d})" class="p-3 rounded-lg border border-[#E2E8F0] hover:border-[#0F4C81] flex items-center justify-between gap-3 cursor-pointer">
+                  <div class="flex items-center gap-3 text-xs">
+                    <span class="w-16 font-bold text-[#0F172A]">${daysHeaders[i]} ${d}</span>
+                    ${s ? `<span class="px-2.5 py-1 rounded-md font-semibold ${shiftStyles[s.type]}">${s.type} (${s.hours})</span>` : `<span class="text-[#94A3B8]">Día Libre</span>`}
+                  </div>
+                  <span class="text-xs font-medium text-[#475569]">${s ? s.state : "—"}</span>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `;
+      }
+    }
+
+    function showSyncToast(msg) {
+      const t = document.getElementById("sync-toast");
+      t.classList.remove("hidden");
+      t.textContent = "✓ " + msg;
+    }
+
+    function copyIcal() {
+      const url = document.getElementById("ical-url").value;
+      if (navigator.clipboard) navigator.clipboard.writeText(url).catch(() => {});
+      showSyncToast("Enlace iCal (.ics) copiado al portapapeles.");
+    }
+
+    function toggleGoogleSync() {
+      googleConnected = !googleConnected;
+      const btn = document.getElementById("btn-google");
+      if (googleConnected) {
+        btn.className = "w-full px-4 py-2.5 rounded-lg border border-[#BBF7D0] bg-[#DCFCE7] text-xs font-semibold text-[#16A34A] cursor-pointer";
+        btn.textContent = "✓ Sincronizado con Google Calendar (Tiempo real)";
+        showSyncToast("Google Calendar conectado vía OAuth. Los cambios aprobados se sincronizarán automáticamente.");
+      } else {
+        btn.className = "w-full px-4 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-xs font-semibold text-[#0F172A] hover:border-[#0F4C81] cursor-pointer";
+        btn.textContent = "Conectar con Google Calendar";
+      }
+    }
+
+    setView("month");
+    selectDay(25);
+  </script>
+</body>
+</html>

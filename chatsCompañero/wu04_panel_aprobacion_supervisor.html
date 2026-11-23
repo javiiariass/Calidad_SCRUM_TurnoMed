@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnoMed · WU-04 Panel de Aprobación Supervisor</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased m-0 p-0">
+
+  <!-- Banner Superior Común -->
+  <header class="bg-[#0F4C81] text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[#0D9488] text-white flex items-center justify-center font-bold text-base shadow-inner">+</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold tracking-tight">TurnoMed</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-white/15 text-white/95 font-medium">Hospital Universitario · Urgencias</span>
+          </div>
+          <p class="text-xs text-blue-100">Gestión Inteligente de Turnos y Guardias Sanitarias</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap items-center gap-1 text-xs">
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Cuadrante Oficial</span>
+        <span class="px-3 py-1.5 rounded-md bg-white text-[#0F4C81] font-semibold shadow-sm cursor-default">Bandeja Aprobación</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Bajas Urgentes</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Avisos Planta</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Fair-Play</span>
+      </nav>
+
+      <div class="flex items-center gap-3 text-xs">
+        <div class="px-2.5 py-1 rounded-md bg-[#0D9488] text-white font-medium">Rol: Supervisor</div>
+        <div class="text-right leading-tight">
+          <div class="font-semibold">Dr. Martín Vega</div>
+          <div class="text-blue-100">Supervisor Planta · SUP-008</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Título -->
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div>
+        <h1 class="text-lg font-bold text-[#0F172A]">Panel de aprobación en un clic para el supervisor</h1>
+        <p class="text-xs text-[#475569]">Permutas acordadas entre compañeros y pre-validadas por el motor legal de 12 horas.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs px-2.5 py-1 rounded-full bg-[#E0F2FE] text-[#0F4C81] font-semibold border border-[#BAE6FD]">WU-04 · Supervisor</span>
+        <button type="button" onclick="approveAll()"
+          class="px-3.5 py-1.5 rounded-lg bg-[#0D9488] text-white text-xs font-semibold hover:opacity-90 transition cursor-pointer">
+          ✓ Aprobar todas en lote
+        </button>
+      </div>
+    </div>
+
+    <div id="action-feedback" class="hidden p-3.5 rounded-xl text-xs font-medium border"></div>
+
+    <!-- Bandeja de Pendientes -->
+    <section class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-[#0F172A]">Solicitudes pendientes de aprobación (ordenadas por proximidad)</h2>
+        <span id="pending-badge" class="text-xs px-2.5 py-1 rounded-full bg-[#FEF3C7] text-[#D97706] font-semibold"></span>
+      </div>
+
+      <div id="pending-list" class="space-y-3"></div>
+    </section>
+
+    <!-- Historial Reciente -->
+    <section class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-3">
+      <h2 class="text-sm font-semibold text-[#0F172A]">Historial reciente de resoluciones</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]">
+              <th class="py-2.5 px-3 font-semibold">Cedente ↔ Receptor</th>
+              <th class="py-2.5 px-3 font-semibold">Turnos intercambiados</th>
+              <th class="py-2.5 px-3 font-semibold">Validación</th>
+              <th class="py-2.5 px-3 font-semibold">Resolución / Motivo</th>
+            </tr>
+          </thead>
+          <tbody id="history-body" class="divide-y divide-[#E2E8F0]"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    let pending = [
+      {
+        id: 1,
+        daysLeft: "En 2 días",
+        cedente: "Carlos Ruiz (ENF-019)",
+        receptor: "Ana Belén Gil (ENF-024)",
+        turnoA: "18 Nov · Mañana (08:00–15:00)",
+        turnoB: "21 Nov · Mañana (08:00–15:00)",
+        rejecting: false
+      },
+      {
+        id: 2,
+        daysLeft: "En 5 días",
+        cedente: "Laura Gómez (ENF-042)",
+        receptor: "Elena Morales (ENF-014)",
+        turnoA: "25 Nov · Tarde (15:00–22:00)",
+        turnoB: "27 Nov · Tarde (15:00–22:00)",
+        rejecting: false
+      },
+      {
+        id: 3,
+        daysLeft: "En 9 días",
+        cedente: "Dr. Iván Soto (MIR-005)",
+        receptor: "Dra. Lucía Marín (MIR-009)",
+        turnoA: "29 Nov · Guardia 24h",
+        turnoB: "04 Dic · Guardia 24h",
+        rejecting: false
+      }
+    ];
+
+    const history = [
+      {
+        pair: "Marta Sánchez ↔ David López",
+        shifts: "12 Nov Noche ↔ 15 Nov Noche",
+        legal: "Cumple 12h",
+        status: "Aprobada",
+        reason: "Aprobada en 1 clic · Cuadrante actualizado"
+      }
+    ];
+
+    function showFeedback(msg, ok) {
+      const el = document.getElementById("action-feedback");
+      el.classList.remove("hidden");
+      el.className = ok
+        ? "p-3.5 rounded-xl text-xs font-medium border border-[#BBF7D0] text-[#16A34A] bg-[#DCFCE7]"
+        : "p-3.5 rounded-xl text-xs font-medium border border-[#FECACA] text-[#DC2626] bg-[#FEE2E2]";
+      el.textContent = msg;
+    }
+
+    function render() {
+      document.getElementById("pending-badge").textContent = `${pending.length} pendientes`;
+      const pl = document.getElementById("pending-list");
+      if (pending.length === 0) {
+        pl.innerHTML = `<div class="p-6 text-center text-xs text-[#475569] bg-[#F8FAFC] rounded-lg border border-[#E2E8F0]">No hay solicitudes pendientes de revisión. Todas las permutas están al día.</div>`;
+      } else {
+        pl.innerHTML = pending.map(item => `
+          <div class="p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-md bg-[#E0F2FE] text-[#0F4C81] text-xs font-semibold">${item.daysLeft}</span>
+                <span class="text-xs font-bold text-[#0F172A]">${item.cedente} ↔ ${item.receptor}</span>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full bg-[#DCFCE7] text-[#16A34A] text-xs font-semibold">✓ Pre-validado 12h</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[#475569]">
+              <div class="p-2.5 rounded-lg bg-white border border-[#E2E8F0]">Turno cedido: <strong class="text-[#0F172A]">${item.turnoA}</strong></div>
+              <div class="p-2.5 rounded-lg bg-white border border-[#E2E8F0]">A cambio de: <strong class="text-[#0F172A]">${item.turnoB}</strong></div>
+            </div>
+
+            ${item.rejecting ? `
+              <div class="p-3 rounded-lg bg-white border border-[#FECACA] space-y-2">
+                <label class="text-xs font-semibold text-[#DC2626] block">Motivo obligatorio del rechazo (se enviará a ambos sanitarios):</label>
+                <div class="flex flex-wrap gap-2">
+                  <input id="reason-${item.id}" type="text" placeholder="Ej. Cobertura crítica de triaje en ese turno..."
+                    class="flex-1 min-w-[200px] px-3 py-1.5 rounded-lg border border-[#E2E8F0] text-xs focus:outline-none focus:border-[#DC2626]" />
+                  <button type="button" onclick="confirmReject(${item.id})"
+                    class="px-3 py-1.5 rounded-lg bg-[#DC2626] text-white text-xs font-semibold cursor-pointer">Confirmar rechazo</button>
+                  <button type="button" onclick="toggleReject(${item.id}, false)"
+                    class="px-3 py-1.5 rounded-lg border border-[#E2E8F0] text-xs text-[#475569] cursor-pointer">Cancelar</button>
+                </div>
+              </div>
+            ` : `
+              <div class="flex items-center justify-end gap-2">
+                <button type="button" onclick="toggleReject(${item.id}, true)"
+                  class="px-3.5 py-1.5 rounded-lg border border-[#FECACA] bg-white text-[#DC2626] text-xs font-semibold hover:bg-[#FEE2E2] transition cursor-pointer">
+                  Rechazar con motivo
+                </button>
+                <button type="button" onclick="approveOne(${item.id})"
+                  class="px-4 py-1.5 rounded-lg bg-[#0F4C81] text-white text-xs font-semibold hover:bg-[#0B3B66] transition shadow-sm cursor-pointer">
+                  ✓ Aprobar en 1 clic
+                </button>
+              </div>
+            `}
+          </div>
+        `).join("");
+      }
+
+      const hb = document.getElementById("history-body");
+      hb.innerHTML = history.map(h => `
+        <tr>
+          <td class="py-2.5 px-3 font-semibold text-[#0F172A]">${h.pair}</td>
+          <td class="py-2.5 px-3 text-[#475569]">${h.shifts}</td>
+          <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-md bg-[#DCFCE7] text-[#16A34A] font-medium">✓ ${h.legal}</span></td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded-full font-semibold mr-2 ${h.status === "Aprobada" ? "bg-[#DCFCE7] text-[#16A34A]" : "bg-[#FEE2E2] text-[#DC2626]"}">${h.status}</span>
+            <span class="text-[#475569]">${h.reason}</span>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function approveOne(id) {
+      const idx = pending.findIndex(x => x.id === id);
+      if (idx === -1) return;
+      const item = pending.splice(idx, 1)[0];
+      history.unshift({
+        pair: `${item.cedente} ↔ ${item.receptor}`,
+        shifts: `${item.turnoA} ↔ ${item.turnoB}`,
+        legal: "Cumple 12h",
+        status: "Aprobada",
+        reason: "Aprobada en 1 clic · Cuadrante actualizado"
+      });
+      render();
+      showFeedback(`Permuta aprobada al instante. Cuadrante actualizado y notificación enviada a ${item.cedente} y ${item.receptor}.`, true);
+    }
+
+    function approveAll() {
+      if (pending.length === 0) return;
+      const count = pending.length;
+      pending.forEach(item => {
+        history.unshift({
+          pair: `${item.cedente} ↔ ${item.receptor}`,
+          shifts: `${item.turnoA} ↔ ${item.turnoB}`,
+          legal: "Cumple 12h",
+          status: "Aprobada",
+          reason: "Aprobación en lote · Cuadrante actualizado"
+        });
+      });
+      pending = [];
+      render();
+      showFeedback(`${count} permutas aprobadas en lote. Cuadrante oficial actualizado automáticamente.`, true);
+    }
+
+    function toggleReject(id, flag) {
+      pending = pending.map(x => x.id === id ? { ...x, rejecting: flag } : x);
+      render();
+    }
+
+    function confirmReject(id) {
+      const input = document.getElementById(`reason-${id}`);
+      const reason = input ? input.value.trim() : "";
+      if (!reason) {
+        return showFeedback("Debes introducir un motivo obligatorio para rechazar el intercambio.", false);
+      }
+      const idx = pending.findIndex(x => x.id === id);
+      const item = pending.splice(idx, 1)[0];
+      history.unshift({
+        pair: `${item.cedente} ↔ ${item.receptor}`,
+        shifts: `${item.turnoA} ↔ ${item.turnoB}`,
+        legal: "Cumple 12h",
+        status: "Rechazada",
+        reason: `Motivo: ${reason}`
+      });
+      render();
+      showFeedback(`Permuta rechazada ("${reason}"). Los turnos originales permanecen sin cambios en el cuadrante.`, false);
+    }
+
+    render();
+  </script>
+</body>
+</html>

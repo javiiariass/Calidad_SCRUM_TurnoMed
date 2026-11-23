@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnoMed · WU-13 Dashboard B2B</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased m-0 p-0">
+
+  <!-- Banner Superior Común -->
+  <header class="bg-[#0F4C81] text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[#0D9488] text-white flex items-center justify-center font-bold text-base shadow-inner">+</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold tracking-tight">TurnoMed</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-white/15 text-white/95 font-medium">Hospital Universitario · Dirección</span>
+          </div>
+          <p class="text-xs text-blue-100">Gestión Inteligente de Turnos y Guardias Sanitarias</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap items-center gap-1 text-xs">
+        <span class="px-3 py-1.5 rounded-md bg-white text-[#0F4C81] font-semibold shadow-sm cursor-default">Dashboard B2B</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Convenios y Reglas</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Auditoría Legal</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Personal y Servicios</span>
+      </nav>
+
+      <div class="flex items-center gap-3 text-xs">
+        <div class="px-2.5 py-1 rounded-md bg-[#0D9488] text-white font-medium">Plan PRO B2B</div>
+        <div class="text-right leading-tight">
+          <div class="font-semibold">Elena Torres</div>
+          <div class="text-blue-100">Dirección RRHH · RRHH-002</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Título + Filtros -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="text-lg font-bold text-[#0F172A]">Cuadro de mandos y analítica de cumplimiento legal (Dashboard B2B)</h1>
+        <p class="text-xs text-[#475569]">Métricas Lean de agilidad operativa, cobertura y 100% cumplimiento normativo para Gerencia y RRHH.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 text-xs">
+        <span class="px-2.5 py-1 rounded-full bg-[#E0F2FE] text-[#0F4C81] font-semibold border border-[#BAE6FD]">WU-13 · RRHH / Dirección</span>
+        <select id="unit-filter" onchange="renderDashboard()" class="px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white font-medium">
+          <option value="all">Todas las unidades (Global)</option>
+          <option value="urg">Urgencias</option>
+          <option value="uci">UCI</option>
+          <option value="quir">Quirófanos</option>
+        </select>
+        <button type="button" onclick="exportExecutivePdf()"
+          class="px-3.5 py-1.5 rounded-lg bg-[#0F4C81] text-white font-semibold hover:bg-[#0B3B66] cursor-pointer">
+          Exportar Informe PDF
+        </button>
+      </div>
+    </div>
+
+    <div id="pdf-toast" class="hidden p-3.5 rounded-xl border border-[#BBF7D0] bg-[#DCFCE7] text-[#16A34A] text-xs font-medium"></div>
+
+    <!-- KPI Cards -->
+    <section id="kpi-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></section>
+
+    <!-- Comparativa por Unidades -->
+    <section class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-semibold text-[#0F172A]">Comparativa de rendimiento y cumplimiento por unidad clínica</h2>
+          <p class="text-xs text-[#475569]">Objetivos Lean Canvas: resolución &lt; 2h · cobertura &gt; 95% · cumplimiento legal 100%</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-[#E2E8F0] bg-[#F8FAFC] text-[#475569]">
+              <th class="py-2.5 px-3 font-semibold">Unidad / Servicio</th>
+              <th class="py-2.5 px-3 font-semibold">Tiempo medio cambio</th>
+              <th class="py-2.5 px-3 font-semibold">Bajas cubiertas</th>
+              <th class="py-2.5 px-3 font-semibold">Infracciones evitadas (12h)</th>
+              <th class="py-2.5 px-3 font-semibold">Cumplimiento</th>
+            </tr>
+          </thead>
+          <tbody id="units-table" class="divide-y divide-[#E2E8F0]"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const kpiData = {
+      all: { time: "1.4 h", timeSub: "Objetivo < 2h (vs 24-48h)", cov: "97.5 %", covSub: "Target > 95% cubiertas", legal: "100 %", blocked: "24 bloqueos preventivos", wau: "142 activos", wauSub: "+18% crecimiento mensual" },
+      urg: { time: "1.1 h", timeSub: "Unidad más rápida", cov: "98.2 %", covSub: "54/55 guardias cubiertas", legal: "100 %", blocked: "12 bloqueos preventivos", wau: "58 activos", wauSub: "+22% mensual" },
+      uci: { time: "1.6 h", timeSub: "Dentro de target (< 2h)", cov: "96.8 %", covSub: "30/31 guardias cubiertas", legal: "100 %", blocked: "7 bloqueos preventivos", wau: "46 activos", wauSub: "+15% mensual" },
+      quir: { time: "1.5 h", timeSub: "Dentro de target (< 2h)", cov: "97.1 %", covSub: "34/35 guardias cubiertas", legal: "100 %", blocked: "5 bloqueos preventivos", wau: "38 activos", wauSub: "+16% mensual" }
+    };
+
+    const unitRows = [
+      { key: "urg", name: "Urgencias", time: "1.1 h", cov: "98.2 %", blocked: "12 intentos bloqueados", compliance: "100 %" },
+      { key: "uci", name: "UCI (Cuidados Intensivos)", time: "1.6 h", cov: "96.8 %", blocked: "7 intentos bloqueados", compliance: "100 %" },
+      { key: "quir", name: "Quirófanos", time: "1.5 h", cov: "97.1 %", blocked: "5 intentos bloqueados", compliance: "100 %" }
+    ];
+
+    function renderDashboard() {
+      const f = document.getElementById("unit-filter").value;
+      const d = kpiData[f];
+      document.getElementById("kpi-grid").innerHTML = `
+        <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
+          <div class="text-xs font-medium text-[#475569]">Tiempo medio de resolución</div>
+          <div class="text-2xl font-bold text-[#0F4C81] mt-2">${d.time}</div>
+          <div class="text-xs text-[#16A34A] font-medium mt-1">✓ ${d.timeSub}</div>
+        </div>
+        <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
+          <div class="text-xs font-medium text-[#475569]">Tasa de cobertura de bajas</div>
+          <div class="text-2xl font-bold text-[#0D9488] mt-2">${d.cov}</div>
+          <div class="text-xs text-[#16A34A] font-medium mt-1">✓ ${d.covSub}</div>
+        </div>
+        <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
+          <div class="text-xs font-medium text-[#475569]">Cumplimiento legal (Regla 12h)</div>
+          <div class="text-2xl font-bold text-[#16A34A] mt-2">${d.legal}</div>
+          <div class="text-xs text-[#D97706] font-medium mt-1">🛡 ${d.blocked}</div>
+        </div>
+        <div class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
+          <div class="text-xs font-medium text-[#475569]">Usuarios activos (WAU/MAU)</div>
+          <div class="text-2xl font-bold text-[#0F172A] mt-2">${d.wau}</div>
+          <div class="text-xs text-[#0F4C81] font-medium mt-1">↗ ${d.wauSub}</div>
+        </div>
+      `;
+
+      const filteredRows = f === "all" ? unitRows : unitRows.filter(r => r.key === f);
+      document.getElementById("units-table").innerHTML = filteredRows.map(r => `
+        <tr>
+          <td class="py-3 px-3 font-semibold text-[#0F172A]">${r.name}</td>
+          <td class="py-3 px-3 text-[#0F4C81] font-semibold">${r.time}</td>
+          <td class="py-3 px-3 font-medium">${r.cov}</td>
+          <td class="py-3 px-3 text-[#D97706] font-medium">${r.blocked}</td>
+          <td class="py-3 px-3"><span class="px-2.5 py-0.5 rounded-full bg-[#DCFCE7] text-[#16A34A] font-semibold">${r.compliance}</span></td>
+        </tr>
+      `).join("");
+    }
+
+    function exportExecutivePdf() {
+      const t = document.getElementById("pdf-toast");
+      t.classList.remove("hidden");
+      t.textContent = "✓ Informe ejecutivo B2B (Métricas Lean y Cumplimiento Legal) exportado en PDF.";
+    }
+
+    renderDashboard();
+  </script>
+</body>
+</html>

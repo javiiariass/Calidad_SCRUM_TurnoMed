@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnoMed · WU-18 Autenticación y Control de Acceso</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased m-0 p-0">
+
+  <!-- Banner Superior Común -->
+  <header class="bg-[#0F4C81] text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[#0D9488] text-white flex items-center justify-center font-bold text-base shadow-inner">+</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold tracking-tight">TurnoMed</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-white/15 text-white/95 font-medium">Acceso Seguro RGPD</span>
+          </div>
+          <p class="text-xs text-blue-100">Gestión Inteligente de Turnos y Guardias Sanitarias</p>
+        </div>
+      </div>
+
+      <span class="text-xs px-2.5 py-1 rounded-full bg-white/15 text-white font-medium">WU-18 · Visitante / Usuario</span>
+    </div>
+  </header>
+
+  <main class="max-w-md mx-auto px-4 py-10 space-y-6">
+
+    <section class="bg-white border border-[#E2E8F0] rounded-xl p-6 shadow-sm space-y-5">
+      <div class="text-center space-y-1">
+        <h1 class="text-lg font-bold text-[#0F172A]">Iniciar sesión en TurnoMed</h1>
+        <p class="text-xs text-[#475569]">Accede con tu identificador de usuario (userid) o correo corporativo</p>
+      </div>
+
+      <!-- Paso 1: Credenciales -->
+      <div id="step-login" class="space-y-3 text-xs">
+        <div>
+          <label class="font-semibold block mb-1">Userid o Correo Corporativo</label>
+          <input id="login-user" type="text" value="m.vega@hospital.es"
+            class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white focus:outline-none focus:border-[#0F4C81]" />
+        </div>
+        <div>
+          <label class="font-semibold block mb-1">Contraseña</label>
+          <input id="login-pass" type="password" value="********"
+            class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white focus:outline-none focus:border-[#0F4C81]" />
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <button type="button" onclick="simulateFail()" class="text-[#DC2626] hover:underline cursor-pointer">Simular fallo de clave</button>
+          <button type="button" onclick="showRecovery()" class="text-[#0F4C81] font-semibold hover:underline cursor-pointer">¿Olvidaste tu contraseña?</button>
+        </div>
+
+        <button type="button" onclick="doLogin()"
+          class="w-full px-4 py-2.5 rounded-lg bg-[#0F4C81] text-white font-semibold hover:bg-[#0B3B66] cursor-pointer">
+          Entrar al sistema
+        </button>
+      </div>
+
+      <!-- Paso 2: Selector de Rol (Usuario multi-rol) -->
+      <div id="step-role" class="hidden space-y-3 text-xs">
+        <div class="p-3 rounded-lg bg-[#F0F9FF] border border-[#BAE6FD] text-[#0F4C81]">
+          <strong>Perfil multi-rol detectado:</strong> Tu cuenta (Dr. Martín Vega) tiene más de un rol asignado. Elige cómo deseas operar en esta sesión:
+        </div>
+        <button type="button" onclick="enterRole('Sanitario (Médico Adjunto)')"
+          class="w-full p-3 rounded-lg border border-[#E2E8F0] bg-white hover:border-[#0F4C81] text-left cursor-pointer">
+          <div class="font-bold text-[#0F172A]">Acceder como Sanitario</div>
+          <div class="text-[#475569]">Consultar mi calendario y proponer cambios de guardia</div>
+        </button>
+        <button type="button" onclick="enterRole('Supervisor de Planta')"
+          class="w-full p-3 rounded-lg border border-[#E2E8F0] bg-white hover:border-[#0F4C81] text-left cursor-pointer">
+          <div class="font-bold text-[#0F172A]">Acceder como Supervisor de Planta</div>
+          <div class="text-[#475569]">Aprobar permutas, lanzar alertas urgentes y exportar cuadrante</div>
+        </button>
+      </div>
+
+      <!-- Paso 3: Recuperar Contraseña -->
+      <div id="step-recover" class="hidden space-y-3 text-xs">
+        <div class="font-semibold text-[#0F172A]">Recuperar contraseña por email</div>
+        <input id="rec-email" type="email" placeholder="tu.correo@hospital.es"
+          class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0]" />
+        <div class="flex gap-2">
+          <button type="button" onclick="sendRecovery()"
+            class="flex-1 px-3 py-2 rounded-lg bg-[#0D9488] text-white font-semibold cursor-pointer">Enviar enlace</button>
+          <button type="button" onclick="backToLogin()"
+            class="px-3 py-2 rounded-lg border border-[#E2E8F0] text-[#475569] cursor-pointer">Volver</button>
+        </div>
+      </div>
+
+      <div id="auth-feedback" class="hidden p-3 rounded-lg text-xs font-medium border"></div>
+    </section>
+
+  </main>
+
+  <script>
+    let failCount = 0;
+
+    function showMsg(msg, ok) {
+      const el = document.getElementById("auth-feedback");
+      el.classList.remove("hidden");
+      el.className = ok
+        ? "p-3 rounded-lg text-xs font-medium border border-[#BBF7D0] text-[#16A34A] bg-[#DCFCE7]"
+        : "p-3 rounded-lg text-xs font-medium border border-[#FECACA] text-[#DC2626] bg-[#FEE2E2]";
+      el.textContent = msg;
+    }
+
+    function doLogin() {
+      if (failCount >= 3) {
+        return showMsg("Cuenta bloqueada temporalmente (15 min) por reiterados intentos fallidos.", false);
+      }
+      const user = document.getElementById("login-user").value.trim();
+      const pass = document.getElementById("login-pass").value.trim();
+      if (!user || !pass) return showMsg("Introduce tu userid y contraseña.", false);
+
+      document.getElementById("step-login").classList.add("hidden");
+      document.getElementById("step-role").classList.remove("hidden");
+      document.getElementById("auth-feedback").classList.add("hidden");
+    }
+
+    function simulateFail() {
+      failCount++;
+      if (failCount >= 3) {
+        showMsg("3 intentos fallidos detectados: Cuenta bloqueada temporalmente por seguridad.", false);
+      } else {
+        showMsg(`Credenciales incorrectas (Intento ${failCount}/3 antes de bloqueo temporal).`, false);
+      }
+    }
+
+    function enterRole(role) {
+      showMsg(`✓ Sesión iniciada correctamente como "${role}". Acceso registrado en auditoría RGPD.`, true);
+    }
+
+    function showRecovery() {
+      document.getElementById("step-login").classList.add("hidden");
+      document.getElementById("step-recover").classList.remove("hidden");
+      document.getElementById("auth-feedback").classList.add("hidden");
+    }
+
+    function backToLogin() {
+      document.getElementById("step-recover").classList.add("hidden");
+      document.getElementById("step-login").classList.remove("hidden");
+    }
+
+    function sendRecovery() {
+      const e = document.getElementById("rec-email").value.trim();
+      if (!e) return showMsg("Introduce tu correo corporativo registrado.", false);
+      showMsg(`✓ Enlace temporal de restablecimiento enviado a ${e}.`, true);
+    }
+  </script>
+</body>
+</html>

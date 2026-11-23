@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnoMed · WU-02 Solicitud y Acuerdo P2P</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased m-0 p-0">
+
+  <!-- Banner Superior Común -->
+  <header class="bg-[#0F4C81] text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[#0D9488] text-white flex items-center justify-center font-bold text-base shadow-inner">+</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold tracking-tight">TurnoMed</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-white/15 text-white/95 font-medium">Hospital Universitario · Urgencias</span>
+          </div>
+          <p class="text-xs text-blue-100">Gestión Inteligente de Turnos y Guardias Sanitarias</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap items-center gap-1 text-xs">
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Mi Calendario</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Publicar Guardia</span>
+        <span class="px-3 py-1.5 rounded-md bg-white text-[#0F4C81] font-semibold shadow-sm cursor-default">Tablón P2P</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Panel Supervisor</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Fair-Play</span>
+      </nav>
+
+      <div class="flex items-center gap-3 text-xs">
+        <div class="px-2.5 py-1 rounded-md bg-[#0D9488] text-white font-medium">Fair-Play: +1</div>
+        <div class="text-right leading-tight">
+          <div class="font-semibold">Laura Gómez</div>
+          <div class="text-blue-100">Enfermería · ENF-042</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Título de Módulo -->
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div>
+        <h1 class="text-lg font-bold text-[#0F172A]">Solicitud y acuerdo de cambio entre compañeros (Peer-to-Peer)</h1>
+        <p class="text-xs text-[#475569]">Postúlate a guardias de tu misma categoría o acepta propuestas sobre tus turnos ofertados para enviarlas al supervisor.</p>
+      </div>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-[#E0F2FE] text-[#0F4C81] font-semibold border border-[#BAE6FD]">WU-02 · Sanitario</span>
+    </div>
+
+    <!-- Feedback Banner -->
+    <div id="global-feedback" class="hidden p-3.5 rounded-xl text-xs font-medium border"></div>
+
+    <!-- Grid superior: Tablón disponible + Panel de Postulación -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Tablón de ofertas disponibles -->
+      <section class="lg:col-span-7 bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-sm font-semibold text-[#0F172A]">1. Guardias ofertadas en tu servicio</h2>
+            <p class="text-xs text-[#475569]">Filtrado automáticamente: Enfermería · Urgencias</p>
+          </div>
+          <span id="available-count" class="text-xs px-2.5 py-1 rounded-full bg-[#CCFBF1] text-[#0F766E] font-semibold"></span>
+        </div>
+
+        <div id="offers-list" class="space-y-3"></div>
+      </section>
+
+      <!-- Postularme a oferta seleccionada -->
+      <section class="lg:col-span-5 bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+        <div>
+          <h2 class="text-sm font-semibold text-[#0F172A]">2. Proponer mi turno a cambio</h2>
+          <p class="text-xs text-[#475569]">Selecciona una oferta de la izquierda para postularte</p>
+        </div>
+
+        <div id="selected-offer-box" class="p-3.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-xs"></div>
+
+        <div class="space-y-2">
+          <label class="text-xs font-semibold text-[#0F172A] block">Tu turno disponible para ofrecer en trueque</label>
+          <select id="my-swap-shift" class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] focus:outline-none focus:border-[#0F4C81]"></select>
+        </div>
+
+        <div>
+          <label for="proposal-msg" class="text-xs font-semibold text-[#0F172A] block mb-1.5">Mensaje para el compañero (opcional)</label>
+          <input id="proposal-msg" type="text" placeholder="Ej. Me viene genial este cambio y cumplo las 12h..."
+            class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] focus:outline-none focus:border-[#0F4C81]" />
+        </div>
+
+        <div class="p-3 rounded-lg border border-[#BAE6FD] bg-[#F0F9FF] text-xs text-[#0F4C81]">
+          <strong>Pre-check automático:</strong> No se muestran turnos propios ya comprometidos en otro acuerdo activo.
+        </div>
+
+        <button type="button" onclick="sendProposal()"
+          class="w-full px-4 py-2.5 rounded-lg bg-[#0F4C81] text-white text-xs font-semibold hover:bg-[#0B3B66] transition shadow-sm cursor-pointer">
+          Enviar propuesta de cambio
+        </button>
+      </section>
+    </div>
+
+    <!-- Propuestas recibidas en mis ofertas -->
+    <section class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 class="text-sm font-semibold text-[#0F172A]">3. Propuestas recibidas para mi turno ofertado (25 Nov · Tarde)</h2>
+          <p class="text-xs text-[#475569]">Al aceptar una propuesta, el resto se cancelan automáticamente y el acuerdo pasa al Supervisor.</p>
+        </div>
+        <span id="my-offer-status" class="text-xs px-2.5 py-1 rounded-full bg-[#FEF3C7] text-[#D97706] font-semibold">Pendiente de elección</span>
+      </div>
+
+      <div id="incoming-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+  </main>
+
+  <script>
+    const typeColors = {
+      "Mañana": "bg-[#DBEAFE] text-[#1D4ED8]",
+      "Tarde": "bg-[#E0E7FF] text-[#4338CA]",
+      "Noche": "bg-[#FEF3C7] text-[#B45309]",
+      "Guardia 24h": "bg-[#CCFBF1] text-[#0F766E]"
+    };
+
+    const openOffers = [
+      {
+        id: 101,
+        owner: "Carlos Ruiz",
+        code: "ENF-019",
+        date: "20 Nov (Vie)",
+        type: "Tarde",
+        hours: "15:00 – 22:00",
+        seeking: "22 Nov o 28 Nov",
+        allowFairPlay: false,
+        note: "Necesito librar el viernes tarde por cita familiar.",
+        applied: false
+      },
+      {
+        id: 102,
+        owner: "Marta Sánchez",
+        code: "ENF-031",
+        date: "23 Nov (Lun)",
+        type: "Noche",
+        hours: "22:00 – 08:00",
+        seeking: "Abierto a propuestas / Fair-Play (+1)",
+        allowFairPlay: true,
+        note: "Puedo cederla contra banco de saldos si alguien la cubre.",
+        applied: false
+      },
+      {
+        id: 103,
+        owner: "David López",
+        code: "ENF-055",
+        date: "29 Nov (Dom)",
+        type: "Guardia 24h",
+        hours: "08:00 – 08:00",
+        seeking: "Guardia 24h en Diciembre o Noche",
+        allowFairPlay: false,
+        note: "Prefiero guardia equivalente.",
+        applied: false
+      }
+    ];
+
+    const myShifts = [
+      { id: "s1", label: "19 Nov (Jue) · Mañana (08:00–15:00)", committed: false },
+      { id: "s2", label: "22 Nov (Dom) · Guardia 24h (08:00–08:00)", committed: false },
+      { id: "s3", label: "25 Nov (Mié) · Tarde — YA OFERTADO (No elegible)", committed: true },
+      { id: "s4", label: "28 Nov (Sáb) · Noche (22:00–08:00)", committed: false }
+    ];
+
+    let incomingProposals = [
+      {
+        id: 201,
+        candidate: "Elena Morales",
+        code: "ENF-014",
+        offeredShift: "27 Nov (Vie) · Tarde (15:00–22:00)",
+        ruleCheck: "Pre-validado 12h",
+        msg: "Me cuadra perfectamente tu tarde del 25.",
+        status: "Pendiente"
+      },
+      {
+        id: 202,
+        candidate: "Javier Castro",
+        code: "ENF-027",
+        offeredShift: "Asumir contra Banco Fair-Play (+1 para Javier)",
+        ruleCheck: "Pre-validado 12h",
+        msg: "Puedo cubrirte ese turno sin trueque.",
+        status: "Pendiente"
+      }
+    ];
+
+    let selectedOfferId = 101;
+    let myOfferLocked = false;
+
+    function showBanner(msg, ok) {
+      const b = document.getElementById("global-feedback");
+      b.classList.remove("hidden");
+      b.className = ok
+        ? "p-3.5 rounded-xl text-xs font-medium border border-[#BBF7D0] text-[#16A34A] bg-[#DCFCE7]"
+        : "p-3.5 rounded-xl text-xs font-medium border border-[#FECACA] text-[#DC2626] bg-[#FEE2E2]";
+      b.textContent = msg;
+    }
+
+    function renderOffers() {
+      const box = document.getElementById("offers-list");
+      document.getElementById("available-count").textContent = `${openOffers.length} ofertas de compañeros`;
+      box.innerHTML = "";
+
+      openOffers.forEach(o => {
+        const active = o.id === selectedOfferId;
+        const badge = typeColors[o.type] || "bg-[#F1F5F9] text-[#475569]";
+        const div = document.createElement("div");
+        div.onclick = () => { selectedOfferId = o.id; renderOffers(); renderSelectedOffer(); renderMyShifts(); };
+        div.className = `p-3.5 rounded-xl border transition cursor-pointer ${
+          active ? "border-[#0F4C81] bg-[#F0F9FF] ring-1 ring-[#0F4C81]" : "border-[#E2E8F0] bg-white hover:border-[#94A3B8]"
+        }`;
+        div.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2 text-xs font-semibold text-[#0F172A]">
+              <span>${o.date}</span>
+              <span class="px-2 py-0.5 rounded-md ${badge}">${o.type}</span>
+              <span class="text-[#475569] font-normal">(${o.hours})</span>
+            </div>
+            <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold ${
+              o.applied ? "bg-[#DCFCE7] text-[#16A34A]" : "bg-[#E0F2FE] text-[#0F4C81]"
+            }">${o.applied ? "Postulado" : "Disponible"}</span>
+          </div>
+          <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[#475569]">
+            <span><strong>${o.owner}</strong> (${o.code})</span>
+            <span>Busca: <strong class="text-[#0F172A]">${o.seeking}</strong></span>
+          </div>
+          <p class="mt-1.5 text-xs text-[#475569] italic">"${o.note}"</p>
+        `;
+        box.appendChild(div);
+      });
+    }
+
+    function renderSelectedOffer() {
+      const o = openOffers.find(x => x.id === selectedOfferId);
+      const box = document.getElementById("selected-offer-box");
+      if (!o) return;
+      box.innerHTML = `
+        <div class="font-semibold text-[#0F172A]">Oferta de ${o.owner}: ${o.date} · ${o.type}</div>
+        <div class="text-[#475569] mt-0.5">Preferencia: ${o.seeking}</div>
+      `;
+    }
+
+    function renderMyShifts() {
+      const o = openOffers.find(x => x.id === selectedOfferId);
+      const sel = document.getElementById("my-swap-shift");
+      sel.innerHTML = "";
+      myShifts.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = s.label;
+        if (s.committed) opt.disabled = true;
+        sel.appendChild(opt);
+      });
+      if (o && o.allowFairPlay) {
+        const optFP = document.createElement("option");
+        optFP.value = "fairplay";
+        optFP.textContent = "Asumir guardia sin trueque (Suma +1 en Fair-Play)";
+        sel.appendChild(optFP);
+      }
+    }
+
+    function sendProposal() {
+      const o = openOffers.find(x => x.id === selectedOfferId);
+      if (!o) return;
+      if (o.applied) {
+        return showBanner(`Ya has enviado una propuesta para la guardia de ${o.owner} (${o.date}).`, false);
+      }
+      const sel = document.getElementById("my-swap-shift");
+      const chosen = sel.options[sel.selectedIndex];
+      if (!chosen || chosen.disabled) {
+        return showBanner("Selecciona un turno propio libre de conflictos para ofrecer a cambio.", false);
+      }
+      o.applied = true;
+      document.getElementById("proposal-msg").value = "";
+      renderOffers();
+      showBanner(`Propuesta enviada a ${o.owner} ofreciendo "${chosen.textContent}". Queda pendiente de su aceptación.`, true);
+    }
+
+    function renderIncoming() {
+      const container = document.getElementById("incoming-list");
+      container.innerHTML = "";
+      incomingProposals.forEach(p => {
+        let statusBadge = "bg-[#FEF3C7] text-[#D97706]";
+        if (p.status === "Aceptada (Enviada al Supervisor)") statusBadge = "bg-[#DCFCE7] text-[#16A34A]";
+        else if (p.status.startsWith("Cancelada") || p.status === "Rechazada") statusBadge = "bg-[#F1F5F9] text-[#64748B]";
+
+        const card = document.createElement("div");
+        card.className = "p-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] space-y-2.5";
+        card.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <div class="text-xs font-bold text-[#0F172A]">${p.candidate} <span class="font-normal text-[#475569]">(${p.code})</span></div>
+            <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold ${statusBadge}">${p.status}</span>
+          </div>
+          <div class="text-xs text-[#0F172A]">Propone: <strong>${p.offeredShift}</strong></div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="px-2 py-0.5 rounded-md bg-[#DCFCE7] text-[#16A34A] font-medium">✓ ${p.ruleCheck}</span>
+            <span class="text-[#475569] italic">"${p.msg}"</span>
+          </div>
+          ${!myOfferLocked && p.status === "Pendiente" ? `
+            <div class="pt-2 flex items-center gap-2">
+              <button type="button" onclick="acceptIncoming(${p.id})"
+                class="flex-1 px-3 py-1.5 rounded-lg bg-[#0D9488] text-white text-xs font-semibold hover:opacity-90 cursor-pointer">
+                Aceptar acuerdo
+              </button>
+              <button type="button" onclick="rejectIncoming(${p.id})"
+                class="px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-[#475569] text-xs font-medium hover:border-[#94A3B8] cursor-pointer">
+                Rechazar
+              </button>
+            </div>
+          ` : ""}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function acceptIncoming(id) {
+      myOfferLocked = true;
+      incomingProposals = incomingProposals.map(p => {
+        if (p.id === id) return { ...p, status: "Aceptada (Enviada al Supervisor)" };
+        if (p.status === "Pendiente") return { ...p, status: "Cancelada automáticamente" };
+        return p;
+      });
+      const st = document.getElementById("my-offer-status");
+      st.textContent = "Acuerdo cerrado · En bandeja del Supervisor";
+      st.className = "text-xs px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#16A34A] font-semibold";
+      renderIncoming();
+      showBanner("Acuerdo cerrado entre compañeros. Se han descartado las demás postulaciones y la solicitud ha pasado automáticamente al Supervisor.", true);
+    }
+
+    function rejectIncoming(id) {
+      incomingProposals = incomingProposals.map(p => p.id === id ? { ...p, status: "Rechazada" } : p);
+      renderIncoming();
+      showBanner("Propuesta rechazada. La oferta sigue abierta en el tablón.", false);
+    }
+
+    renderOffers();
+    renderSelectedOffer();
+    renderMyShifts();
+    renderIncoming();
+  </script>
+</body>
+</html>

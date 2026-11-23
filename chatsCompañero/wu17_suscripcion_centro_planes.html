@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnoMed · WU-17 Suscripción y Planes</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased m-0 p-0">
+
+  <!-- Banner Superior Común -->
+  <header class="bg-[#0F4C81] text-white shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-[#0D9488] text-white flex items-center justify-center font-bold text-base shadow-inner">+</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold tracking-tight">TurnoMed</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-white/15 text-white/95 font-medium">Alta Hospital / Centro</span>
+          </div>
+          <p class="text-xs text-blue-100">Gestión Inteligente de Turnos y Guardias Sanitarias</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap items-center gap-1 text-xs">
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Personal y Servicios</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Convenios y Reglas</span>
+        <span class="px-3 py-1.5 rounded-md bg-white text-[#0F4C81] font-semibold shadow-sm cursor-default">Suscripción PRO</span>
+        <span class="px-3 py-1.5 rounded-md text-blue-100 hover:bg-white/10 cursor-pointer">Dashboard B2B</span>
+      </nav>
+
+      <div class="flex items-center gap-3 text-xs">
+        <div class="px-2.5 py-1 rounded-md bg-[#0D9488] text-white font-medium">Gestor B2B</div>
+        <div class="text-right leading-tight">
+          <div class="font-semibold">Gerencia / RRHH</div>
+          <div class="text-blue-100">Registro de Centro</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- Título -->
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div>
+        <h1 class="text-lg font-bold text-[#0F172A]">Suscripción de centro hospitalario y gestión de Plan (Freemium / PRO)</h1>
+        <p class="text-xs text-[#475569]">Elige el plan gratuito por planta (hasta 15 usuarios) o contrata el Plan PRO B2B con pago seguro y factura PDF.</p>
+      </div>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-[#E0F2FE] text-[#0F4C81] font-semibold border border-[#BAE6FD]">WU-17 · Gestor / Visitante</span>
+    </div>
+
+    <div id="sub-feedback" class="hidden p-3.5 rounded-xl text-xs font-medium border"></div>
+
+    <!-- Comparador de Planes -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div onclick="selectPlan('freemium')" id="card-freemium"
+        class="bg-white border rounded-xl p-5 shadow-sm space-y-3 cursor-pointer transition">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-bold text-[#0F172A]">Plan Freemium (Planta Piloto)</h2>
+          <span class="text-lg font-bold text-[#0D9488]">0 € / mes</span>
+        </div>
+        <ul class="text-xs text-[#475569] space-y-1.5">
+          <li>✓ Hasta <strong>15 profesionales</strong> activos en 1 unidad</li>
+          <li>✓ Tablón P2P y calendario básico</li>
+          <li>✕ Sin exportación oficial a RRHH ni Dashboard B2B</li>
+        </ul>
+      </div>
+
+      <div onclick="selectPlan('pro')" id="card-pro"
+        class="bg-white border rounded-xl p-5 shadow-sm space-y-3 cursor-pointer transition">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-bold text-[#0F172A]">Plan PRO B2B Hospitalario</h2>
+          <span class="text-lg font-bold text-[#0F4C81]">79 € / planta · mes</span>
+        </div>
+        <ul class="text-xs text-[#475569] space-y-1.5">
+          <li>✓ Plantas y profesionales ilimitados con motor legal 12h completo</li>
+          <li>✓ Exportación oficial PDF/Excel a RRHH + Certificados legales</li>
+          <li>✓ Dashboard ejecutivo y soporte prioritario</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Formulario de Alta y Pago -->
+    <section class="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-6 text-xs">
+      <div class="lg:col-span-7 space-y-3">
+        <h3 class="text-sm font-semibold text-[#0F172A]">Datos del hospital o clínica</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="font-semibold block mb-1">Nombre del centro</label>
+            <input id="center-name" type="text" placeholder="Hospital San Lucas" class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0]" />
+          </div>
+          <div>
+            <label class="font-semibold block mb-1">CIF / Código centro</label>
+            <input id="center-cif" type="text" placeholder="B-41009922" class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0]" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="font-semibold block mb-1">Número de sanitarios previstos</label>
+            <input id="staff-count" type="number" value="12" min="1" oninput="updateTotals()" class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0]" />
+          </div>
+          <div id="plants-wrap">
+            <label class="font-semibold block mb-1">Número de plantas / unidades</label>
+            <input id="plants-count" type="number" value="3" min="1" oninput="updateTotals()" class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0]" />
+          </div>
+        </div>
+
+        <div id="card-payment-box" class="p-3.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] space-y-2.5">
+          <div class="font-semibold text-[#0F172A]">Pasarela de Pago Segura (Tarjeta Corporativa)</div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <input id="cc-num" type="text" placeholder="4532 •••• •••• 8810" class="sm:col-span-2 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white" />
+            <input id="cc-cvv" type="text" placeholder="MM/AA · CVV" class="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white" />
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4 flex flex-col justify-between space-y-4">
+        <div class="space-y-2">
+          <h3 class="text-sm font-semibold text-[#0F172A]">Resumen de suscripción</h3>
+          <div class="flex justify-between"><span>Plan seleccionado:</span><strong id="sum-plan">Plan PRO B2B</strong></div>
+          <div class="flex justify-between"><span>Unidades / Plantas:</span><strong id="sum-units">3 plantas</strong></div>
+          <div class="flex justify-between pt-2 border-t border-[#E2E8F0] text-sm">
+            <span class="font-bold">Coste Total Mensual:</span>
+            <strong id="sum-total" class="text-[#0F4C81]">237 € / mes</strong>
+          </div>
+        </div>
+        <button type="button" onclick="completeSubscription()"
+          class="w-full px-4 py-2.5 rounded-lg bg-[#0F4C81] text-white font-semibold hover:bg-[#0B3B66] cursor-pointer">
+          Confirmar alta y generar recibo PDF
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    let selectedPlan = "pro";
+    const existingCenters = ["hospital universitario", "b-11223344"];
+
+    function selectPlan(p) {
+      selectedPlan = p;
+      document.getElementById("card-freemium").className = p === "freemium"
+        ? "bg-[#F0F9FF] border-2 border-[#0F4C81] rounded-xl p-5 shadow-sm space-y-3 cursor-pointer"
+        : "bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-3 cursor-pointer hover:border-[#94A3B8]";
+      document.getElementById("card-pro").className = p === "pro"
+        ? "bg-[#F0F9FF] border-2 border-[#0F4C81] rounded-xl p-5 shadow-sm space-y-3 cursor-pointer"
+        : "bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-3 cursor-pointer hover:border-[#94A3B8]";
+
+      document.getElementById("plants-wrap").style.display = p === "pro" ? "block" : "none";
+      document.getElementById("card-payment-box").style.display = p === "pro" ? "block" : "none";
+      updateTotals();
+    }
+
+    function updateTotals() {
+      const plants = Math.max(1, Number(document.getElementById("plants-count").value || 1));
+      if (selectedPlan === "freemium") {
+        document.getElementById("sum-plan").textContent = "Freemium (Gratuito)";
+        document.getElementById("sum-units").textContent = "1 planta (máx. 15 usuarios)";
+        document.getElementById("sum-total").textContent = "0 € / mes";
+      } else {
+        document.getElementById("sum-plan").textContent = "Plan PRO B2B";
+        document.getElementById("sum-units").textContent = `${plants} planta(s)`;
+        document.getElementById("sum-total").textContent = `${plants * 79} € / mes`;
+      }
+    }
+
+    function showToast(msg, ok) {
+      const el = document.getElementById("sub-feedback");
+      el.classList.remove("hidden");
+      el.className = ok
+        ? "p-3.5 rounded-xl text-xs font-medium border border-[#BBF7D0] text-[#16A34A] bg-[#DCFCE7]"
+        : "p-3.5 rounded-xl text-xs font-medium border border-[#FECACA] text-[#DC2626] bg-[#FEE2E2]";
+      el.textContent = msg;
+    }
+
+    function completeSubscription() {
+      const name = document.getElementById("center-name").value.trim();
+      const cif = document.getElementById("center-cif").value.trim();
+      const staff = Number(document.getElementById("staff-count").value || 0);
+
+      if (!name || !cif) return showToast("Introduce el nombre y CIF del centro hospitalario.", false);
+      if (existingCenters.includes(name.toLowerCase()) || existingCenters.includes(cif.toLowerCase())) {
+        return showToast(`Advertencia: Ya existe un registro previo para "${name}" (${cif}).`, false);
+      }
+      if (selectedPlan === "freemium" && staff > 15) {
+        return showToast("El Plan Freemium está limitado a un máximo de 15 profesionales por planta. Selecciona el Plan PRO B2B.", false);
+      }
+      if (selectedPlan === "pro" && !document.getElementById("cc-num").value.trim()) {
+        return showToast("Introduce los datos de tarjeta para procesar el pago seguro del Plan PRO.", false);
+      }
+      showToast(`✓ Centro "${name}" registrado en ${selectedPlan.toUpperCase()}. Factura/recibo oficial generada en PDF.`, true);
+    }
+
+    selectPlan("pro");
+  </script>
+</body>
+</html>
